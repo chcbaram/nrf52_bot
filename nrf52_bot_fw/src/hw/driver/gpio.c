@@ -27,7 +27,7 @@ typedef struct
 
 gpio_tbl_t gpio_tbl[GPIO_MAX_CH] =
 {
-  {NRF_GPIO_PIN_MAP(1, 7), _DEF_OUTPUT,  _DEF_HIGH, _DEF_HIGH},  // 0. LCD_RESET
+  {NRF_GPIO_PIN_MAP(1, 9), _DEF_OUTPUT,  _DEF_HIGH, _DEF_HIGH},  // 0. LCD_RESET
 };
 
 

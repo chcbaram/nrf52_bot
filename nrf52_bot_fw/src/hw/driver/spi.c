@@ -88,11 +88,11 @@ void spiBegin(uint8_t spi_ch)
       p_spi->h_spi->CSNPOL = (0<<SPIM_PSEL_CSN_PIN_Pos);  // Active Low
       p_spi->h_spi->DCXCNT = 0;
 
-      p_spi->h_spi->PSEL.SCK  = NRF_GPIO_PIN_MAP(1,  4);
-      p_spi->h_spi->PSEL.MOSI = NRF_GPIO_PIN_MAP(1,  5);
+      p_spi->h_spi->PSEL.SCK  = NRF_GPIO_PIN_MAP(0, 14);
+      p_spi->h_spi->PSEL.MOSI = NRF_GPIO_PIN_MAP(0, 13);
       p_spi->h_spi->PSEL.MISO = 0;
-      p_spi->h_spi->PSEL.CSN  = NRF_GPIO_PIN_MAP(1,  8);
-      p_spi->h_spi->PSELDCX   = NRF_GPIO_PIN_MAP(1,  6);
+      p_spi->h_spi->PSEL.CSN  = NRF_GPIO_PIN_MAP(0,  6);
+      p_spi->h_spi->PSELDCX   = NRF_GPIO_PIN_MAP(0,  8);
 
       nrf_gpio_cfg(
           p_spi->h_spi->PSEL.SCK,

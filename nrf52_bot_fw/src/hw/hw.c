@@ -61,4 +61,6 @@ void hwInit(void)
   flashInit();
 
   usbInit();
+
+  ssd1351Init();
 }
