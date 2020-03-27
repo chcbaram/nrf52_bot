@@ -27,6 +27,10 @@ void apInit(void)
 void apMain(void)
 {
   uint32_t pre_time;
+  uint16_t x = 0;
+  uint16_t y = 0;
+  bool update = false;
+
 
   while(1)
   {
@@ -35,6 +39,7 @@ void apMain(void)
       pre_time = millis();
 
       ledToggle(_DEF_LED1);
+      update = true;
     }
     cmdifMain();
 
@@ -43,10 +48,36 @@ void apMain(void)
       tud_task();
     }
 
-    if (uartAvailable(_DEF_UART2) > 0)
+#if 1
+    static uint32_t fps_time = 0;
+    static uint32_t fps = 0;
+
+    if (lcdDrawAvailable() > 0)
     {
-      uartPrintf(_DEF_UART2, "rx : 0x%X\n", uartRead(_DEF_UART2));
+      lcdClearBuffer(black);
+
+      if (update == true)
+      {
+        update = false;
+        fps_time = lcdGetFpsTime();
+        fps = lcdGetFps();
+      }
+
+      lcdPrintf(0,  0, white, "%d ms", fps_time);
+      lcdPrintf(0, 16, white, "%d fps", fps);
+
+      lcdDrawFillRect(x, 32, 20, 20, red);
+      lcdDrawFillRect(lcdGetWidth()-x, 52, 20, 20, green);
+      lcdDrawFillRect(x + 30, 72, 20, 20, blue);
+
+      x += 2;
+
+      x %= lcdGetWidth();
+      y %= lcdGetHeight();
+
+      lcdRequestDraw();
     }
+#endif
   }
 }
 

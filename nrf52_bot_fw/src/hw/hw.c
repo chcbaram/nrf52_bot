@@ -62,5 +62,5 @@ void hwInit(void)
 
   usbInit();
 
-  ssd1351Init();
+  lcdInit();
 }

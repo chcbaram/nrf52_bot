@@ -41,8 +41,11 @@
 #define _USE_HW_GPIO
 #define      HW_GPIO_MAX_CH         1
 
-#define _USE_HW_SSD1351
-
+#define _USE_HW_ST7735
+#define _USE_HW_LCD
+#define      HW_LCD_COLOR_SWAP      1
+#define      HW_LCD_WIDTH           160
+#define      HW_LCD_HEIGHT          128
 
 
 #endif /* SRC_HW_HW_DEF_H_ */

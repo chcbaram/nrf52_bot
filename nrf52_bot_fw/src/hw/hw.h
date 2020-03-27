@@ -29,7 +29,8 @@ extern "C" {
 #include "gpio.h"
 #include "ili9341.h"
 #include "ssd1351.h"
-
+#include "st7735.h"
+#include "lcd.h"
 
 void hwInit(void);
 
