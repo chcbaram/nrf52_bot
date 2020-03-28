@@ -24,7 +24,7 @@ extern "C" {
 
 
 //#define logPrintf(...)    printf(__VA_ARGS__)
-#define logPrintf(...)
+#define logPrintf(...) uartPrintf(_DEF_UART2, __VA_ARGS__)
 
 void bspInit(void);
 void bspDeInit(void);
@@ -32,6 +32,8 @@ void bspDeInit(void);
 extern void delay(uint32_t delay_ms);
 extern uint32_t millis(void);
 extern uint32_t micros(void);
+
+extern int32_t uartPrintf(uint8_t channel, const char *fmt, ...);
 
 
 #ifdef __cplusplus
