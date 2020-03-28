@@ -11,7 +11,7 @@ _Min_Stack_Size = 0x400;; /* required amount of stack */
 MEMORY
 {
 FLASH (rx)     : ORIGIN = 0x00027000, LENGTH = 512K
-RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 256K
+RAM (xrw)      : ORIGIN = 0x20008000, LENGTH = 224K
 }
 
 /* Define output sections */
@@ -26,6 +26,14 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
+  .tag :
+  {
+    . = ALIGN(4);
+    _flash_tag_addr = .;
+    KEEP(*(.tag)) 
+    . = ALIGN(4);
+  } >FLASH
+  
   /* The program code and other data goes into FLASH */
   .text :
   {

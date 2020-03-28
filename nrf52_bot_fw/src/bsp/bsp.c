@@ -41,12 +41,17 @@ void bspInit(void)
 
   if (sd_version == SD_VERSION)
   {
+    sd_softdevice_disable();
+    sd_softdevice_vector_table_base_set((uint32_t)&__isr_vector_addr);
+
+    /*
     command.command = SD_MBR_COMMAND_INIT_SD;
     sd_mbr_command(&command);
 
     command.command = SD_MBR_COMMAND_IRQ_FORWARD_ADDRESS_SET;
     command.params.irq_forward_address_set.address = (uint32_t)&__isr_vector_addr;
     sd_mbr_command(&command);
+    */
   }
 
 
