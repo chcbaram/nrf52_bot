@@ -23,8 +23,8 @@ extern "C" {
 
 
 
-#define logPrintf(...)    printf(__VA_ARGS__)
-
+//#define logPrintf(...)    printf(__VA_ARGS__)
+#define logPrintf(...)
 
 void bspInit(void);
 void bspDeInit(void);
