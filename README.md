@@ -15,6 +15,11 @@
     
   * GNU Arm Embeddded Toolchain: 8-2018-q4
     * https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+    * HEX 생성시 버그 있음 
+      * https://devzone.nordicsemi.com/f/nordic-q-a/43354/linker-error-address-out-of-range-for-intel-hex-files
+  * GNU Arm Embeddded Toolchain: 6-2017-q2
+    * HEX 생성 정상 
+  
 
 * ## 라이브러리
   * nrfx V2.1.0
