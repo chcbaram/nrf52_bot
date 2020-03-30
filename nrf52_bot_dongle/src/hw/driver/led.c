@@ -21,10 +21,9 @@ typedef struct
 
 led_port_t led_port_tbl[LED_MAX_CH] =
 {
-    {NRF_GPIO_PIN_MAP(0, 6), 0},
-    {NRF_GPIO_PIN_MAP(0, 8), 0},
-    {NRF_GPIO_PIN_MAP(1, 9), 0},
-    {NRF_GPIO_PIN_MAP(0,12), 0},
+    {NRF_GPIO_PIN_MAP(0,23), 0},
+    {NRF_GPIO_PIN_MAP(0,22), 0},
+    {NRF_GPIO_PIN_MAP(0,24), 0},
 };
 
 
