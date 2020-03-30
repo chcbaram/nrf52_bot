@@ -51,7 +51,6 @@
 #define      HW_SPI_MAX_CH          1
 
 #define _USE_HW_RADIO
-#define      HW_RADIO_MAX_CH        8
 #define      HW_RADIO_BASE_ADDR     0x12345678
 
 

@@ -16,30 +16,10 @@
 #include "nrf_radio.h"
 
 
-
-
-
-
-
-
 #ifdef _USE_HW_CMDIF
 void radioCmdif(void);
 #endif
 
-
-static char *radioInfo_MODE(char *str);
-static char *radioInfo_STATE(char *str);
-
-uint32_t radioGetPrefixAddr(uint8_t index);
-uint32_t radioGetBaseAddr(uint8_t index);
-void radioSetPrefixAddr(uint8_t index, uint8_t data);
-void radioSetBaseAddr(uint8_t index, uint32_t data);
-void radioSetRxAddrEnable(uint8_t index, bool enable);
-bool radioGetRxAddrEnable(uint8_t index);
-bool radioSetReadyForRx(uint32_t timeout_ms);
-bool radioSetReadyForTx(uint32_t timeout_ms);
-bool radioSetStart(void);
-bool radioSetStop(void);
 
 
 
@@ -58,25 +38,36 @@ const nrf_radio_packet_conf_t nrf_packet_config =
         .plen   = NRF_RADIO_PREAMBLE_LENGTH_8BIT,
         .crcinc = false,
         .termlen = 0,
-        .maxlen = 255,
+        .maxlen = RADIO_PAYLOAD_LEN+1,
         .statlen = 0,
         .balen   = 4, // Base address length
         .big_endian = false,
         .whiteen = false,
     };
 
-typedef struct
-{
-  uint8_t S0;
-  uint8_t LENGTH;
-  uint8_t S1;
-  uint8_t PAYLOAD[255];
-} radio_packet_t;
+
+static bool is_init = false;
+static bool is_open = false;
+
+
+static radio_packet_t rx_packet;
+static radio_packet_t tx_packet;
 
 
 
-radio_packet_t rx_packet;
-radio_packet_t tx_packet;
+static char *radioInfo_MODE(char *str);
+static char *radioInfo_STATE(char *str);
+
+uint32_t radioGetPrefixAddr(uint8_t index);
+uint32_t radioGetBaseAddr(uint8_t index);
+void     radioSetPrefixAddr(uint8_t index, uint8_t data);
+void     radioSetBaseAddr(uint8_t index, uint32_t data);
+void     radioSetRxAddrEnable(uint8_t index, bool enable);
+bool     radioGetRxAddrEnable(uint8_t index);
+bool     radioSetReadyForRx(uint32_t timeout_ms);
+bool     radioSetReadyForTx(uint32_t timeout_ms);
+bool     radioSetStart(void);
+bool     radioSetStop(void);
 
 
 
@@ -96,6 +87,7 @@ bool radioInit(void)
   nrf_radio_crcinit_set(NRF_RADIO, 0);
   nrf_radio_crc_configure(NRF_RADIO, 2, 0, 0x11021);
 
+
   radioSetRxAddrEnable(0, true);
 
 
@@ -106,11 +98,87 @@ bool radioInit(void)
 #ifdef _USE_HW_CMDIF
   cmdifAdd("radio", radioCmdif);
 #endif
+
+  is_init = true;
+
   return true;
+}
+
+bool radioOpen(radio_baud_t baud, uint32_t addr)
+{
+  uint32_t i;
+
+
+  for (i=0; i<8; i++)
+  {
+    radioSetBaseAddr(i, addr);
+  }
+
+
+  switch(baud)
+  {
+    case RADIO_BAUD_1M:
+      nrf_radio_mode_set(NRF_RADIO, NRF_RADIO_MODE_NRF_1MBIT);
+      break;
+
+    case RADIO_BAUD_2M:
+      nrf_radio_mode_set(NRF_RADIO, NRF_RADIO_MODE_NRF_2MBIT);
+      break;
+
+    default:
+      nrf_radio_mode_set(NRF_RADIO, NRF_RADIO_MODE_NRF_1MBIT);
+      break;
+  }
+
+  is_open = true;
+
+  return true;
+}
+
+bool radioWrite(radio_ch_t ch, radio_packet_t *p_packet, uint32_t timeout_ms)
+{
+  bool ret = true;
+
+
+  memcpy(&tx_packet, p_packet, sizeof(radio_packet_t));
+
+  nrf_radio_packetptr_set(NRF_RADIO, &tx_packet);
+  radioSetReadyForTx(100);
+  radioSetStart();
+
+  return ret;
+}
+
+bool radioPrintf(uint8_t channel, const char *fmt, ...)
+{
+  bool ret = true;
+  va_list arg;
+  va_start (arg, fmt);
+  int32_t len;
+  radio_packet_t *p_packet = &tx_packet;
+
+
+  len = vsnprintf((char *)p_packet->PAYLOAD, RADIO_PAYLOAD_LEN + 1, fmt, arg);
+  va_end (arg);
+
+  p_packet->ID =  channel;
+  p_packet->TYPE = RADIO_TYPE_STR;
+  p_packet->LENGTH = len;
+
+  nrf_radio_packetptr_set(NRF_RADIO, p_packet);
+  radioSetReadyForTx(100);
+  radioSetStart();
+
+  return ret;
 }
 
 
 
+
+
+
+//-- Internal Function
+//
 uint32_t radioGetPrefixAddr(uint8_t index)
 {
   uint32_t ret = 0;
@@ -181,15 +249,6 @@ void radioSetBaseAddr(uint8_t index, uint32_t data)
   {
     nrf_radio_base1_set(NRF_RADIO, data);
   }
-}
-
-uint32_t radioGetAddr(uint8_t index)
-{
-  uint32_t ret;
-
-  ret = radioGetPrefixAddr(index);
-
-  return ret;
 }
 
 void radioSetRxAddrEnable(uint8_t index, bool enable)
@@ -501,8 +560,8 @@ void radioCmdif(void)
 
           if (ch == '1')
           {
-            tx_packet.S0 =  0x55;
-            tx_packet.S1 = ~0x55;
+            tx_packet.ID =  0x55;
+            tx_packet.TYPE = ~0x55;
             tx_packet.LENGTH = 128;
             tx_packet.PAYLOAD[0] = cnt++;
             tx_packet.PAYLOAD[1] = cnt++;
@@ -527,8 +586,8 @@ void radioCmdif(void)
 
       while(cmdifRxAvailable() == 0)
       {
-        tx_packet.S0 =  0x55;
-        tx_packet.S1 = ~0x55;
+        tx_packet.ID =  0x55;
+        tx_packet.TYPE = ~0x55;
         tx_packet.LENGTH = 200;
         tx_packet.PAYLOAD[0] = cnt++;
         tx_packet.PAYLOAD[1] = cnt++;
