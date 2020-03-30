@@ -135,15 +135,37 @@ bool radioOpen(radio_baud_t baud, uint32_t addr)
   return true;
 }
 
+bool radioEnable(radio_ch_t ch)
+{
+  // TODO
+  return true;
+}
+
+int32_t radioAvailable(radio_ch_t ch)
+{
+  // TODO
+  return 0;
+}
+
+bool radioRead(radio_ch_t ch, radio_packet_t *p_packet)
+{
+  // TODO
+  return true;
+}
+
 bool radioWrite(radio_ch_t ch, radio_packet_t *p_packet, uint32_t timeout_ms)
 {
   bool ret = true;
 
 
+  radioSetReadyForTx(100);
+
+  p_packet->ID = ch;
+  p_packet->TYPE = RADIO_TYPE_BIN;
+
   memcpy(&tx_packet, p_packet, sizeof(radio_packet_t));
 
   nrf_radio_packetptr_set(NRF_RADIO, &tx_packet);
-  radioSetReadyForTx(100);
   radioSetStart();
 
   return ret;
