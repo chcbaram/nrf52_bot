@@ -13,6 +13,9 @@
 
 
 void bootCmdif(void);
+static void threadUsb(void const *argument);
+static void threadLED(void const *argument);
+static void threadLCD(void const *argument);
 
 
 void apInit(void)
@@ -22,52 +25,73 @@ void apInit(void)
   cmdifOpen(_DEF_UART1, 57600);
   cmdifAdd("boot", bootCmdif);
 
+  osThreadDef(threadUsb, threadUsb, _HW_DEF_RTOS_THREAD_PRI_USB, 0, _HW_DEF_RTOS_THREAD_MEM_USB);
+  osThreadCreate(osThread(threadUsb), NULL);
+
+  osThreadDef(threadLED, threadLED, _HW_DEF_RTOS_THREAD_PRI_LED, 0, _HW_DEF_RTOS_THREAD_MEM_LED);
+  osThreadCreate(osThread(threadLED), NULL);
+
+  osThreadDef(threadLCD, threadLCD, _HW_DEF_RTOS_THREAD_PRI_LCD, 0, _HW_DEF_RTOS_THREAD_MEM_LCD);
+  osThreadCreate(osThread(threadLCD), NULL);
 }
 
 void apMain(void)
 {
-  uint32_t pre_time;
-  uint16_t x = 0;
-  uint16_t y = 0;
-  bool update = false;
-
-
   while(1)
   {
-    if (millis()-pre_time >= 500)
-    {
-      pre_time = millis();
-
-      ledToggle(_DEF_LED1);
-      update = true;
-    }
     cmdifMain();
+  }
+}
 
-    if ( tusb_inited() )
-    {
+
+static void threadUsb(void const *argument)
+{
+
+  for(;;)
+  {
+    if (tusb_inited()){
       tud_task();
     }
+    osThreadYield();
+  }
+}
 
-#if 1
-    static uint32_t fps_time = 0;
-    static uint32_t fps = 0;
 
-    if (lcdDrawAvailable() > 0)
-    {
+static void threadLED(void const *argument)
+{
+  for(;;)
+  {
+    ledToggle(_DEF_LED1);
+    osDelay(500);
+  }
+}
+
+
+static void threadLCD(void const *argument)
+{
+  bool update = false;
+  uint32_t pre_time;
+  uint32_t fps_time = 0;
+  uint32_t fps = 0;
+  uint16_t x = 0;
+  uint16_t y = 0;
+
+  for(;;)
+  {
+    if (lcdDrawAvailable() > 0){
       lcdClearBuffer(black);
 
-      if (update == true)
-      {
+      if (update == true) {
         update = false;
         fps_time = lcdGetFpsTime();
         fps = lcdGetFps();
       }
 
-      lcdPrintf(0,  0, white, "%d ms", fps_time);
+      lcdPrintf(0, 0, white, "%d ms", fps_time);
       lcdPrintf(0, 16, white, "%d fps", fps);
 
       lcdDrawFillRect(x, 32, 20, 20, red);
-      lcdDrawFillRect(lcdGetWidth()-x, 52, 20, 20, green);
+      lcdDrawFillRect(lcdGetWidth() - x, 52, 20, 20, green);
       lcdDrawFillRect(x + 30, 72, 20, 20, blue);
 
       x += 2;
@@ -77,9 +101,16 @@ void apMain(void)
 
       lcdRequestDraw();
     }
-#endif
+
+    if (millis()-pre_time >= 500){
+      pre_time = millis();
+      update = true;
+    }
+    osThreadYield();
   }
 }
+
+
 
 
 

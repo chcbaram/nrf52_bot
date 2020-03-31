@@ -11,6 +11,7 @@
 #include "bsp.h"
 #include "uart.h"
 #include "usb.h"
+#include "rtos.h"
 #include "nrf_sdm.h"
 #include "nrf_mbr.h"
 #include "nrf_clock.h"
@@ -29,12 +30,13 @@ void SysTick_Handler(void)
 {
   systick_counter++;
   swtimerISR();
+  osSystickHandler();
 }
 
 
 void bspInit(void)
 {
-  sd_mbr_command_t command;
+
   uint32_t sd_version;
 
   sd_version = SD_VERSION_GET(MBR_SIZE);
@@ -45,6 +47,8 @@ void bspInit(void)
     sd_softdevice_vector_table_base_set((uint32_t)&__isr_vector_addr);
 
     /*
+    sd_mbr_command_t command;
+
     command.command = SD_MBR_COMMAND_INIT_SD;
     sd_mbr_command(&command);
 
@@ -93,9 +97,20 @@ int __io_putchar(int ch)
 
 void delay(uint32_t ms)
 {
-  uint32_t pre_time = systick_counter;
+  uint32_t pre_time = millis();
 
-  while(systick_counter-pre_time < ms);
+#ifdef _USE_HW_RTOS
+  if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+  {
+    osDelay(ms);
+  }
+  else
+  {
+    while(millis()-pre_time < ms);
+  }
+#else
+  while(millis()-pre_time < ms);
+#endif
 }
 
 

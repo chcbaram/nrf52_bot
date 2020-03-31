@@ -16,6 +16,7 @@ extern "C" {
 #include "def.h"
 #include "nrf.h"
 
+#include "cmsis_os.h"
 
 #include "nrfx_systick.h"
 #include "nrf_gpio.h"
@@ -23,6 +24,8 @@ extern "C" {
 
 #define logPrintf(...)    printf(__VA_ARGS__)
 
+//#define logPrintf(...)    printf(__VA_ARGS__)
+#define logPrintf(...) uartPrintf(_DEF_UART1, __VA_ARGS__)
 
 void bspInit(void);
 void bspDeInit(void);
@@ -30,6 +33,8 @@ void bspDeInit(void);
 extern void delay(uint32_t delay_ms);
 extern uint32_t millis(void);
 extern uint32_t micros(void);
+
+extern int32_t uartPrintf(uint8_t channel, const char *fmt, ...);
 
 
 #ifdef __cplusplus
