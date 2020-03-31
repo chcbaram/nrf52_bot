@@ -56,6 +56,10 @@
 #define _USE_HW_GPIO
 #define      HW_GPIO_MAX_CH         1
 
+#define _USE_HW_RADIO
+#define      HW_RADIO_BASE_ADDR     0x12345678
+#define      HW_RADIO_MAX_BUF_LEN   8
+
 #define _USE_HW_ST7735
 #define _USE_HW_LCD
 #define      HW_LCD_COLOR_SWAP      1
