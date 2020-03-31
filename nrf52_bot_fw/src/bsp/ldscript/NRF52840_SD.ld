@@ -21,6 +21,7 @@ SECTIONS
   .isr_vector :
   {
     __isr_vector_addr = .;
+    __isr_vector = .;
     . = ALIGN(4);    
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
@@ -33,6 +34,7 @@ SECTIONS
     KEEP(*(.tag)) 
     . = ALIGN(4);
   } >FLASH
+  
   
   /* The program code and other data goes into FLASH */
   .text :
