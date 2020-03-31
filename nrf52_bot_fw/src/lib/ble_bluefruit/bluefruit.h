@@ -24,7 +24,7 @@
 #ifndef BLUEFRUIT_H_
 #define BLUEFRUIT_H_
 
-#include <Arduino.h>
+#include "hw.h"
 #include "bluefruit_common.h"
 
 #define CFG_ADV_BLINKY_INTERVAL   500
@@ -57,24 +57,28 @@
 #include "BLEGatt.h"
 
 // Services
-#include "services/BLEDis.h"
-#include "services/BLEDfu.h"
-#include "services/BLEUart.h"
-#include "services/BLEBas.h"
-#include "services/BLEBeacon.h"
-#include "services/BLEHidGeneric.h"
-#include "services/BLEHidAdafruit.h"
-#include "services/BLEMidi.h"
-#include "services/EddyStone.h"
+//TODO:
+//#include "services/BLEDis.h"
+//#include "services/BLEDfu.h"
+//#include "services/BLEUart.h"
+//#include "services/BLEBas.h"
+//#include "services/BLEBeacon.h"
+//#include "services/BLEHidGeneric.h"
+//#include "services/BLEHidAdafruit.h"
+//#include "services/BLEMidi.h"
+//#include "services/EddyStone.h"
+//
+//#include "clients/BLEAncs.h"
+//#include "clients/BLEClientUart.h"
+//#include "clients/BLEClientDis.h"
+//#include "clients/BLEClientCts.h"
+//#include "clients/BLEClientHidAdafruit.h"
+//#include "clients/BLEClientBas.h"
 
-#include "clients/BLEAncs.h"
-#include "clients/BLEClientUart.h"
-#include "clients/BLEClientDis.h"
-#include "clients/BLEClientCts.h"
-#include "clients/BLEClientHidAdafruit.h"
-#include "clients/BLEClientBas.h"
+//TODO: remove macro below (for temporary)
+#define ada_callback(...) true
+//#include "utility/AdaCallback.h"
 
-#include "utility/AdaCallback.h"
 #include "utility/bonding.h"
 
 enum

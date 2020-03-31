@@ -36,7 +36,7 @@
 #ifndef BLEADVERTISING_H_
 #define BLEADVERTISING_H_
 
-#include <Arduino.h>
+#include "hw.h"
 #include "bluefruit_common.h"
 #include "BLEClientService.h"
 

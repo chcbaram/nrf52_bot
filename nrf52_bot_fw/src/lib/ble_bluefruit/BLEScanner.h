@@ -36,7 +36,7 @@
 #ifndef BLESCANNER_H_
 #define BLESCANNER_H_
 
-#include <Arduino.h>
+#include "hw.h"
 #include "bluefruit_common.h"
 
 #define BLE_SCAN_INTERVAL_DFLT    160 // 100 ms (in 0.625 ms)

@@ -150,15 +150,16 @@ void BLEPeriph::_eventHandler(ble_evt_t* evt)
 
 void BLEPeriph::printInfo(void)
 {
-  char const * title_fmt = "%-16s: ";
-
-  Serial.printf(title_fmt, "Conn Intervals");
-  Serial.printf("min = %.2f ms, ", _ppcp.min_conn_interval*1.25f);
-  Serial.printf("max = %.2f ms", _ppcp.max_conn_interval*1.25f);
-  Serial.println();
-
-  Serial.printf(title_fmt, "Conn Timeout");
-  Serial.printf("%d ms", _ppcp.conn_sup_timeout*10);
-  Serial.println();
+  //TODO:
+//  char const * title_fmt = "%-16s: ";
+//
+//  Serial.printf(title_fmt, "Conn Intervals");
+//  Serial.printf("min = %.2f ms, ", _ppcp.min_conn_interval*1.25f);
+//  Serial.printf("max = %.2f ms", _ppcp.max_conn_interval*1.25f);
+//  Serial.println();
+//
+//  Serial.printf(title_fmt, "Conn Timeout");
+//  Serial.printf("%d ms", _ppcp.conn_sup_timeout*10);
+//  Serial.println();
 }
 

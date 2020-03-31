@@ -37,7 +37,7 @@
 #ifndef BLEPERIPH_H_
 #define BLEPERIPH_H_
 
-#include <Arduino.h>
+#include "hw.h"
 #include "bluefruit_common.h"
 
 class BLEPeriph

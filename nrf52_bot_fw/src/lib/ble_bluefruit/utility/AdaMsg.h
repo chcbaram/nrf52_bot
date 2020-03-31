@@ -36,7 +36,10 @@
 #ifndef ADAMSG_H_
 #define ADAMSG_H_
 
-#include "Arduino.h"
+#include "hw.h"
+#include "rtos.h"
+#include "utility/verify.h"
+#include "utility/common_func.h"
 
 class AdaMsg
 {

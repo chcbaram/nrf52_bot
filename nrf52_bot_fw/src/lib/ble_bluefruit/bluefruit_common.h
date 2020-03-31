@@ -36,7 +36,7 @@
 #ifndef BLUEFRUIT_COMMON_H_
 #define BLUEFRUIT_COMMON_H_
 
-#include <Arduino.h>
+#include "hw.h"
 #include "ble.h"
 #include "nrf_sdm.h"
 

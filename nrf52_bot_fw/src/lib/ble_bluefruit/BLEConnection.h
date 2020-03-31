@@ -37,7 +37,7 @@
 #ifndef BLECONNECTION_H_
 #define BLECONNECTION_H_
 
-#include <Arduino.h>
+#include "hw.h"
 #include "bluefruit_common.h"
 #include "utility/bonding.h"
 

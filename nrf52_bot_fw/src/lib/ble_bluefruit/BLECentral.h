@@ -36,7 +36,7 @@
 #ifndef BLECENTRAL_H_
 #define BLECENTRAL_H_
 
-#include <Arduino.h>
+#include "hw.h"
 #include "bluefruit_common.h"
 
 class AdafruitBluefruit;
