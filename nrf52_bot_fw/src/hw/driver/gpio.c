@@ -14,6 +14,7 @@
 #include "cmdif.h"
 
 
+#ifdef _USE_HW_GPIO
 
 
 typedef struct
@@ -263,3 +264,5 @@ void gpioCmdif(void)
     cmdifPrintf( "gpio on 0~%d ms[0~3000]\n", GPIO_MAX_CH-1);
   }
 }
+
+#endif
