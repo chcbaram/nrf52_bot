@@ -23,9 +23,22 @@ void radioCmdif(void);
 
 
 
+
+
+typedef struct
+{
+  uint32_t length;
+  uint32_t in;
+  uint32_t out;
+
+  radio_packet_t buf[RADIO_MAX_BUF_LEN];
+} radio_buf_t;
+
+
+
 // S0     - 1B
 // LENGTH - 1B
-// S1     - 1B
+// S1     - 2B
 // PAYLOAD- 200B
 
 const nrf_radio_packet_conf_t nrf_packet_config =
@@ -49,9 +62,12 @@ const nrf_radio_packet_conf_t nrf_packet_config =
 static bool is_init = false;
 static bool is_open = false;
 
+volatile bool is_tx_done = true;
 
 static radio_packet_t rx_packet;
 static radio_packet_t tx_packet;
+
+static radio_buf_t *rx_buf[RADIO_MAX_CH];
 
 
 
@@ -71,6 +87,11 @@ bool     radioSetStop(void);
 
 
 
+
+
+
+
+
 bool radioInit(void)
 {
   uint32_t i;
@@ -80,19 +101,26 @@ bool radioInit(void)
   {
     radioSetBaseAddr(i, RADIO_BASE_ADDR);
     radioSetPrefixAddr(i, i);
+
+    rx_buf[i] = NULL;
   }
 
   nrf_radio_packet_configure(NRF_RADIO, &nrf_packet_config);
-
   nrf_radio_crcinit_set(NRF_RADIO, 0);
   nrf_radio_crc_configure(NRF_RADIO, 2, 0, 0x11021);
 
+  nrf_radio_int_enable(NRF_RADIO, RADIO_INTENSET_END_Msk);
 
-  radioSetRxAddrEnable(0, true);
-
+  radioEnable(RADIO_CH_0);
 
 
   nrf_radio_packetptr_set(NRF_RADIO, &rx_packet);
+  radioSetReadyForRx(10);
+  radioSetStart();
+
+
+  NVIC_SetPriority(RADIO_IRQn, 6);
+  NVIC_EnableIRQ(RADIO_IRQn);
 
 
 #ifdef _USE_HW_CMDIF
@@ -137,41 +165,84 @@ bool radioOpen(radio_baud_t baud, uint32_t addr)
 
 bool radioEnable(radio_ch_t ch)
 {
-  // TODO
+  if (rx_buf[ch] == NULL)
+  {
+    rx_buf[ch] = malloc(sizeof(radio_buf_t));
+
+    rx_buf[ch]->length = RADIO_MAX_BUF_LEN;
+    rx_buf[ch]->in = 0;
+    rx_buf[ch]->out = 0;
+
+    radioSetRxAddrEnable(ch, true);
+
+    nrf_radio_packetptr_set(NRF_RADIO, &rx_packet);
+    radioSetReadyForRx(10);
+    radioSetStart();
+  }
   return true;
 }
 
 int32_t radioAvailable(radio_ch_t ch)
 {
-  // TODO
-  return 0;
+  int32_t ret = 0;
+  radio_buf_t *p_node = rx_buf[ch];
+
+  if (p_node != NULL)
+  {
+    ret = (p_node->length + p_node->in - p_node->out) % p_node->length;
+  }
+  return ret;
 }
 
 bool radioRead(radio_ch_t ch, radio_packet_t *p_packet)
 {
-  // TODO
-  return true;
+  bool ret = true;
+  radio_buf_t *p_node = rx_buf[ch];
+
+  if (p_node != NULL && p_node->out != p_node->in)
+  {
+    memcpy(p_packet, &p_node->buf[p_node->out], sizeof(radio_packet_t));
+    p_node->out = (p_node->out + 1) % p_node->length;
+  }
+  else
+  {
+    ret = false;
+  }
+
+  return ret;
 }
 
 bool radioWrite(radio_ch_t ch, radio_packet_t *p_packet, uint32_t timeout_ms)
 {
-  bool ret = true;
+  bool ret = false;
+  uint32_t pre_time;
 
+  radioSetReadyForTx(10);
 
-  radioSetReadyForTx(100);
+  is_tx_done = false;
+  nrf_radio_txaddress_set(NRF_RADIO, ch);
+  nrf_radio_packetptr_set(NRF_RADIO, p_packet);
+  radioSetStart();
 
-  p_packet->ID = ch;
-  p_packet->TYPE = RADIO_TYPE_BIN;
+  pre_time = millis();
+  while(millis()-pre_time < timeout_ms)
+  {
+    if (is_tx_done == true)
+    {
+      ret = true;
+      is_tx_done = false;
+      break;
+    }
+  }
 
-  memcpy(&tx_packet, p_packet, sizeof(radio_packet_t));
-
-  nrf_radio_packetptr_set(NRF_RADIO, &tx_packet);
+  nrf_radio_packetptr_set(NRF_RADIO, &rx_packet);
+  radioSetReadyForRx(10);
   radioSetStart();
 
   return ret;
 }
 
-bool radioPrintf(uint8_t channel, const char *fmt, ...)
+bool radioPrintf(radio_ch_t ch, const char *fmt, ...)
 {
   bool ret = true;
   va_list arg;
@@ -183,13 +254,12 @@ bool radioPrintf(uint8_t channel, const char *fmt, ...)
   len = vsnprintf((char *)p_packet->PAYLOAD, RADIO_PAYLOAD_LEN + 1, fmt, arg);
   va_end (arg);
 
-  p_packet->ID =  channel;
-  p_packet->TYPE = RADIO_TYPE_STR;
+  p_packet->ID     = ch;
+  p_packet->TYPE   = RADIO_TYPE_STR;
   p_packet->LENGTH = len;
 
-  nrf_radio_packetptr_set(NRF_RADIO, p_packet);
-  radioSetReadyForTx(100);
-  radioSetStart();
+
+  ret = radioWrite(ch, p_packet, 100);
 
   return ret;
 }
@@ -330,6 +400,7 @@ bool radioSetReadyForRx(uint32_t timeout_ms)
         break;
 
       case NRF_RADIO_STATE_RX:
+        NRF_RADIO->TASKS_STOP = 1;
         break;
 
       case NRF_RADIO_STATE_TXIDLE:
@@ -389,6 +460,7 @@ bool radioSetReadyForTx(uint32_t timeout_ms)
         break;
 
       case NRF_RADIO_STATE_TX:
+        NRF_RADIO->TASKS_STOP = 1;
         break;
 
       default:
@@ -427,7 +499,6 @@ bool radioInfo(void)
 {
   char str_buf[128];
 
-  NRF_RADIO->TASKS_START = 1;
 
   logPrintf("TXPOWER    : %d dBm\n", nrf_radio_txpower_get(NRF_RADIO));
   logPrintf("FREQ       : %d Mhz\n", nrf_radio_frequency_get(NRF_RADIO));
@@ -487,10 +558,54 @@ char *radioInfo_STATE(char *str)
   return str;
 }
 
+
+
+
+void RADIO_IRQHandler(void)
+{
+  radio_buf_t *p_node;
+  uint32_t next_i;
+  nrf_radio_state_t state = nrf_radio_state_get(NRF_RADIO);
+
+
+  if (NRF_RADIO->EVENTS_END)
+  {
+    NRF_RADIO->EVENTS_END = 0;
+
+    if (state == NRF_RADIO_STATE_TX || state == NRF_RADIO_STATE_TXIDLE)
+    {
+      is_tx_done = true;
+    }
+    else
+    {
+      if (NRF_RADIO->CRCSTATUS)
+      {
+        p_node = rx_buf[NRF_RADIO->RXMATCH];
+
+        if (p_node != NULL)
+        {
+          next_i = (p_node->in + 1) % p_node->length;
+
+          if (next_i != p_node->out)
+          {
+            memcpy(&p_node->buf[p_node->in], &rx_packet, sizeof(radio_packet_t));
+            p_node->in = next_i;
+          }
+        }
+      }
+
+      nrf_radio_packetptr_set(NRF_RADIO, &rx_packet);
+      NRF_RADIO->TASKS_START = 1;
+    }
+  }
+}
+
+
 #ifdef _USE_HW_CMDIF
 void radioCmdif(void)
 {
   bool ret = true;
+  radio_packet_t packet;
 
 
   if (cmdifGetParamCnt() == 1)
@@ -499,78 +614,89 @@ void radioCmdif(void)
     {
       radioInfo();
     }
-    else if (cmdifHasString("rx_ready", 0) == true)
+    else if (cmdifHasString("echo", 0) == true)
     {
-      uint32_t pre_time;
+      uint32_t cnt = 0;
+      uint8_t ch;
 
-      pre_time = micros();
-      radioSetReadyForRx(1000);
-      cmdifPrintf("%d us\n", micros()-pre_time);
-    }
-    else if (cmdifHasString("tx_ready", 0) == true)
-    {
-      uint32_t pre_time;
+      radioEnable(RADIO_CH_1);
 
-      pre_time = micros();
-      radioSetReadyForTx(1000);
-      cmdifPrintf("%d us\n", micros()-pre_time);
-    }
-    else if (cmdifHasString("rx", 0) == true)
-    {
-      NRF_RADIO->EVENTS_READY = 0;
-      NRF_RADIO->EVENTS_END = 0;
-      NRF_RADIO->EVENTS_PAYLOAD = 0;
-      nrf_radio_packetptr_set(NRF_RADIO, &rx_packet);
-      radioSetReadyForRx(100);
-      radioSetStart();
-
-      uint32_t pre_time;
-      uint32_t cnt_sum = 0;
-
-      pre_time = millis();
-      cnt_sum = 0;
-      while(cmdifRxAvailable() == 0)
+      while(1)
       {
-        //cmdifPrintf("R %d E %d P %d\n", NRF_RADIO->EVENTS_READY, NRF_RADIO->EVENTS_END, NRF_RADIO->EVENTS_PAYLOAD);
-
-        if (NRF_RADIO->EVENTS_END)
+        if (cmdifRxAvailable() > 0)
         {
-          NRF_RADIO->EVENTS_READY   = 0;
-          NRF_RADIO->EVENTS_END     = 0;
-          NRF_RADIO->EVENTS_PAYLOAD = 0;
+          ch = cmdifGetch();
 
-          if (NRF_RADIO->CRCSTATUS)
+          if (ch == '1')
           {
-            /*
-            cmdifPrintf("S0 %X, S1 %X, L %X, PAYLOAD %d, %d, %d\n",
-                        rx_packet.S0,
-                        rx_packet.S1,
-                        rx_packet.LENGTH,
-                        rx_packet.PAYLOAD[0],
-                        rx_packet.PAYLOAD[1],
-                        NRF_RADIO->CRCSTATUS);
-                        */
-            cnt_sum += rx_packet.LENGTH;
+            radioPrintf(RADIO_CH_0, "This is Radio %d\n", cnt);
+            cmdifPrintf("CH0 TX -> This is Radio %d\n", cnt);
+            cnt++;
+
+            uint32_t pre_time = millis();
+            while(millis()-pre_time < 100)
+            {
+              if (radioAvailable(RADIO_CH_0) > 0)
+              {
+                radioRead(RADIO_CH_0, &packet);
+                if (packet.TYPE == RADIO_TYPE_STR)
+                {
+                  cmdifPrintf("CH0 RX -> %s", packet.PAYLOAD);
+                }
+                break;
+              }
+            }
           }
-          radioSetStart();
+          else if (ch == '2')
+          {
+            radioPrintf(RADIO_CH_1, "This is Radio %d\n", cnt);
+            cmdifPrintf("CH1 TX -> This is Radio %d\n", cnt);
+            cnt++;
+          }
+          else
+          {
+            break;
+          }
         }
-
-        if (millis()-pre_time >= 1000)
+        if (radioAvailable(RADIO_CH_0) > 0)
         {
-          pre_time = millis();
-
-          cmdifPrintf("%d bytes\n", cnt_sum);
-
-          cnt_sum = 0;
+          radioRead(RADIO_CH_0, &packet);
+          if (packet.TYPE == RADIO_TYPE_STR)
+          {
+            cmdifPrintf("CH0 RX -> %s", packet.PAYLOAD);
+            radioPrintf(RADIO_CH_0, "%s", packet.PAYLOAD);
+          }
+        }
+        if (radioAvailable(RADIO_CH_1) > 0)
+        {
+          radioRead(RADIO_CH_1, &packet);
+          if (packet.TYPE == RADIO_TYPE_STR)
+          {
+            cmdifPrintf("CH1 RX -> %s", packet.PAYLOAD);
+          }
         }
       }
     }
-    else if (cmdifHasString("tx", 0) == true)
+    else if (cmdifHasString("rxd", 0) == true)
+    {
+      while(cmdifRxAvailable() == 0)
+      {
+        if (radioAvailable(RADIO_CH_0) > 0)
+        {
+          radioRead(RADIO_CH_0, &packet);
+          cmdifPrintf("I%X,T%X, L %X, PAYLOAD %d, %d\n",
+                      packet.ID,
+                      packet.TYPE,
+                      packet.LENGTH,
+                      packet.PAYLOAD[0],
+                      packet.PAYLOAD[1]);
+
+        }
+      }
+    }
+    else if (cmdifHasString("txd", 0) == true)
     {
       uint8_t cnt = 0;
-
-      radioSetReadyForTx(100);
-      nrf_radio_packetptr_set(NRF_RADIO, &tx_packet);
 
       while(1)
       {
@@ -582,40 +708,26 @@ void radioCmdif(void)
 
           if (ch == '1')
           {
-            tx_packet.ID =  0x55;
-            tx_packet.TYPE = ~0x55;
-            tx_packet.LENGTH = 128;
+            tx_packet.ID =  0;
+            tx_packet.TYPE = 1;
+            tx_packet.LENGTH = 1;
             tx_packet.PAYLOAD[0] = cnt++;
-            tx_packet.PAYLOAD[1] = cnt++;
+            tx_packet.PAYLOAD[1] = cnt;
 
-            radioSetStart();
-
-            cmdifPrintf("R %d E %d\n", NRF_RADIO->EVENTS_READY, NRF_RADIO->EVENTS_END);
+            if (radioWrite(RADIO_CH_0, &tx_packet, 50) == true)
+            {
+              cmdifPrintf("Tx OK\n");
+            }
+            else
+            {
+              cmdifPrintf("Tx Fail\n");
+            }
           }
           else
           {
             break;
           }
         }
-      }
-    }
-    else if (cmdifHasString("txs", 0) == true)
-    {
-      uint8_t cnt = 0;
-
-      radioSetReadyForTx(100);
-      nrf_radio_packetptr_set(NRF_RADIO, &tx_packet);
-
-      while(cmdifRxAvailable() == 0)
-      {
-        tx_packet.ID =  0x55;
-        tx_packet.TYPE = ~0x55;
-        tx_packet.LENGTH = 200;
-        tx_packet.PAYLOAD[0] = cnt++;
-        tx_packet.PAYLOAD[1] = cnt++;
-
-        radioSetReadyForTx(100);
-        radioSetStart();
       }
     }
     else

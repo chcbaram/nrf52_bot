@@ -52,6 +52,7 @@
 
 #define _USE_HW_RADIO
 #define      HW_RADIO_BASE_ADDR     0x12345678
+#define      HW_RADIO_MAX_BUF_LEN   8
 
 
 

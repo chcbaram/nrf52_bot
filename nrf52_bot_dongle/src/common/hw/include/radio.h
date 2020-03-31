@@ -21,6 +21,7 @@ extern "C" {
 
 #define RADIO_MAX_CH        8
 #define RADIO_BASE_ADDR     HW_RADIO_BASE_ADDR
+#define RADIO_MAX_BUF_LEN   HW_RADIO_MAX_BUF_LEN
 
 
 #define RADIO_PAYLOAD_LEN   128
@@ -28,7 +29,7 @@ extern "C" {
 
 typedef enum
 {
-  RADIO_CH_BROAD = 0,
+  RADIO_CH_0 = 0,
   RADIO_CH_1 = 1,
   RADIO_CH_2 = 2,
   RADIO_CH_3 = 3,
@@ -36,6 +37,7 @@ typedef enum
   RADIO_CH_5 = 5,
   RADIO_CH_6 = 6,
   RADIO_CH_7 = 7,
+  RADIO_CH_MAX,
 } radio_ch_t;
 
 

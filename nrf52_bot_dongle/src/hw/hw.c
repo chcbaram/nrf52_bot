@@ -62,7 +62,9 @@ void hwInit(void)
   //gpioInit();
   spiInit();
   flashInit();
-  radioInit();
 
   usbInit();
+
+  // After usbInit()
+  radioInit();
 }
