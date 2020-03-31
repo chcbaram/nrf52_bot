@@ -22,7 +22,7 @@ extern "C" {
 #include "nrf_gpio.h"
 
 
-#define logPrintf(...)    printf(__VA_ARGS__)
+
 
 //#define logPrintf(...)    printf(__VA_ARGS__)
 #define logPrintf(...) uartPrintf(_DEF_UART1, __VA_ARGS__)
