@@ -62,5 +62,14 @@ void hwInit(void)
 
   usbInit();
 
-  lcdInit();
+  lcdInit();  
+
+
+
+
+
+  // After usbInit()
+  radioInit();
+
+
 }
