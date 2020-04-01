@@ -614,6 +614,32 @@ void radioCmdif(void)
     {
       radioInfo();
     }
+    else if (cmdifHasString("log", 0) == true)
+    {
+      while(1)
+      {
+        uint8_t ch;
+
+        if (cmdifRxAvailable() > 0)
+        {
+          ch = cmdifGetch();
+
+          if (ch == 'x')
+          {
+            break;
+          }
+        }
+
+        if (radioAvailable(RADIO_CH_0) > 0)
+        {
+          radioRead(RADIO_CH_0, &packet);
+          if (packet.TYPE == RADIO_TYPE_STR)
+          {
+            cmdifPrintf("%s", packet.PAYLOAD);
+          }
+        }
+      }
+    }
     else if (cmdifHasString("echo", 0) == true)
     {
       uint32_t cnt = 0;
