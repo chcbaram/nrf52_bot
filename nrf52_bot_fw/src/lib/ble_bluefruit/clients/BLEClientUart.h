@@ -36,7 +36,7 @@
 #ifndef BLECLIENTUART_H_
 #define BLECLIENTUART_H_
 
-#include "bluefruit_common.h"
+#include "nrf52botBLE_common.h"
 #include "utility/adafruit_fifo.h"
 
 #include "BLEClientCharacteristic.h"

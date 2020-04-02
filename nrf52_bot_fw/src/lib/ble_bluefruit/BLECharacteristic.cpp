@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 void BLECharacteristic::_init(void)
 {
@@ -97,7 +97,7 @@ BLEService& BLECharacteristic::parentService (void)
  */
 BLECharacteristic::~BLECharacteristic()
 {
-//   Bluefruit.Gatt._removeCharacteristic(this);
+//   nrf52bot_ble.Gatt._removeCharacteristic(this);
 }
 
 /**
@@ -105,7 +105,7 @@ BLECharacteristic::~BLECharacteristic()
  * and is not last throughout programs. Useful for one-shot set-and-forget
  * Characteristics such as read-only one. Where there is no need for interactions
  * later on. This call will prevent the Characteristics to be hooked into
- * managing chars list of AdafruitBluefruit
+ * managing chars list of nrf52botBLE
  */
 void BLECharacteristic::setTempMemory(void)
 {
@@ -323,10 +323,10 @@ err_t BLECharacteristic::begin(void)
     (void) ref_hdl; // not used
   }
 
-  // Currently Only register to Bluefruit if The Characteristic is not temporary memory i.e local variable
+  // Currently Only register to nrf52bot_ble if The Characteristic is not temporary memory i.e local variable
   if ( !_is_temp )
   {
-    (void) Bluefruit.Gatt._addCharacteristic(this);
+    (void) nrf52bot_ble.Gatt._addCharacteristic(this);
   }
 
   return ERROR_NONE;
@@ -614,7 +614,7 @@ uint32_t BLECharacteristic::read32(void)
 
 uint16_t BLECharacteristic::getCccd(uint16_t conn_hdl)
 {
-  VERIFY( Bluefruit.connected(conn_hdl) && (_handles.cccd_handle != BLE_GATT_HANDLE_INVALID), 0 );
+  VERIFY( nrf52bot_ble.connected(conn_hdl) && (_handles.cccd_handle != BLE_GATT_HANDLE_INVALID), 0 );
 
   uint16_t cccd;
   ble_gatts_value_t value =
@@ -643,7 +643,7 @@ uint16_t BLECharacteristic::getCccd(uint16_t conn_hdl)
  *------------------------------------------------------------------*/
 bool BLECharacteristic::notifyEnabled(void)
 {
-  return this->notifyEnabled(Bluefruit.connHandle());
+  return this->notifyEnabled(nrf52bot_ble.connHandle());
 }
 
 bool BLECharacteristic::notifyEnabled(uint16_t conn_hdl)
@@ -657,14 +657,14 @@ bool BLECharacteristic::notify(uint16_t conn_hdl, const void* data, uint16_t len
   VERIFY( _properties.notify );
 
   // use default conn handle if not passed
-  if ( conn_hdl == BLE_CONN_HANDLE_INVALID ) conn_hdl = Bluefruit.connHandle();
+  if ( conn_hdl == BLE_CONN_HANDLE_INVALID ) conn_hdl = nrf52bot_ble.connHandle();
 
   // could not exceed max len
   uint16_t remaining = min16(len, _max_len);
 
   if ( notifyEnabled(conn_hdl) )
   {
-    BLEConnection* conn = Bluefruit.Connection( conn_hdl );
+    BLEConnection* conn = nrf52bot_ble.Connection( conn_hdl );
     VERIFY(conn);
 
     uint16_t const max_payload = conn->getMtu() - 3;
@@ -771,7 +771,7 @@ bool BLECharacteristic::notify32(int num)
  *------------------------------------------------------------------*/
 bool BLECharacteristic::indicateEnabled(void)
 {
-  return this->indicateEnabled(Bluefruit.connHandle());
+  return this->indicateEnabled(nrf52bot_ble.connHandle());
 }
 
 bool BLECharacteristic::indicateEnabled(uint16_t conn_hdl)
@@ -785,14 +785,14 @@ bool BLECharacteristic::indicate(uint16_t conn_hdl, const void* data, uint16_t l
   VERIFY( _properties.indicate );
 
   // use default conn handle if not passed
-  if ( conn_hdl == BLE_CONN_HANDLE_INVALID ) conn_hdl = Bluefruit.connHandle();
+  if ( conn_hdl == BLE_CONN_HANDLE_INVALID ) conn_hdl = nrf52bot_ble.connHandle();
 
   // could not exceed max len
   uint16_t remaining = min16(len, _max_len);
 
   if ( indicateEnabled(conn_hdl) )
   {
-    BLEConnection* conn = Bluefruit.Connection( conn_hdl );
+    BLEConnection* conn = nrf52bot_ble.Connection( conn_hdl );
     VERIFY(conn);
 
     uint16_t const max_payload = conn->getMtu() - 3;

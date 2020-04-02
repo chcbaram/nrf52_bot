@@ -36,7 +36,7 @@
 #ifndef BONDING_H_
 #define BONDING_H_
 
-#include "bluefruit_common.h"
+#include <nrf52botBLE_common.h>
 
 #define BOND_DIR_PRPH     "/adafruit/bond_prph"
 #define BOND_DIR_CNTR     "/adafruit/bond_cntr"

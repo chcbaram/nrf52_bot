@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 // Last service that is discovered
 BLEClientService* BLEClientService::lastService = NULL;
@@ -66,7 +66,7 @@ bool BLEClientService::begin(void)
   (void) uuid.begin();
 
   lastService = this;
-  (void) Bluefruit.Gatt._addService(this);
+  (void) nrf52bot_ble.Gatt._addService(this);
 
   return true;
 }
@@ -74,9 +74,9 @@ bool BLEClientService::begin(void)
 bool BLEClientService::discover(uint16_t conn_handle)
 {
   // Initialize Discovery module if needed
-  if ( !Bluefruit.Discovery.begun() ) Bluefruit.Discovery.begin();
+  if ( !nrf52bot_ble.Discovery.begun() ) nrf52bot_ble.Discovery.begin();
 
-  VERIFY( Bluefruit.Discovery._discoverService(conn_handle, *this) );
+  VERIFY( nrf52bot_ble.Discovery._discoverService(conn_handle, *this) );
   _conn_hdl = conn_handle;
   return true;
 }

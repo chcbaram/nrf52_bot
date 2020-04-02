@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 #define BLE_ANCS_TIMEOUT   (5*BLE_GENERIC_TIMEOUT)
 
@@ -110,7 +110,7 @@ bool BLEAncs::discover(uint16_t conn_handle)
   // Discover characteristics
   BLEClientCharacteristic* chr_arr[] = { &_control, &_notification, &_data };
 
-  VERIFY( 3 == Bluefruit.Discovery.discoverCharacteristic(conn_handle, chr_arr, 3) );
+  VERIFY( 3 == nrf52bot_ble.Discovery.discoverCharacteristic(conn_handle, chr_arr, 3) );
 
   _conn_hdl = conn_handle;
   return true;

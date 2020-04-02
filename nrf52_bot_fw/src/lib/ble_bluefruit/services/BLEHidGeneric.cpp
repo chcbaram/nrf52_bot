@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 enum {
   REPORT_TYPE_INPUT = 1,

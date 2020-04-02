@@ -36,7 +36,7 @@
 #ifndef BLEUART_H_
 #define BLEUART_H_
 
-#include "bluefruit_common.h"
+#include "nrf52botBLE_common.h"
 #include "utility/adafruit_fifo.h"
 
 #include "BLECharacteristic.h"

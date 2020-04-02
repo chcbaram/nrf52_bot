@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 BLEBas::BLEBas(void) :
   BLEService(UUID16_SVC_BATTERY), _battery(UUID16_CHR_BATTERY_LEVEL)

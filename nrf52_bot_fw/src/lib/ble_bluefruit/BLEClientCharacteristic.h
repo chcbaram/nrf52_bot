@@ -36,7 +36,7 @@
 #ifndef BLECLIENTCHARACTERISTIC_H_
 #define BLECLIENTCHARACTERISTIC_H_
 
-#include "bluefruit_common.h"
+#include <nrf52botBLE_common.h>
 #include "BLEUuid.h"
 #include "BLECharacteristic.h"
 

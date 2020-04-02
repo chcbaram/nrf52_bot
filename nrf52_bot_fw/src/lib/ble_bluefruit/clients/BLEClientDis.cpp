@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 BLEClientDis::BLEClientDis(void)
   : BLEClientService(UUID16_SVC_DEVICE_INFORMATION)
@@ -61,21 +61,21 @@ bool BLEClientDis::discover(uint16_t conn_handle)
 uint16_t BLEClientDis::getChars(uint16_t uuid, char* buffer, uint16_t bufsize)
 {
   uint16_t count = 0;
-  ble_gattc_handle_range_t bck_range = Bluefruit.Discovery.getHandleRange();
+  ble_gattc_handle_range_t bck_range = nrf52bot_ble.Discovery.getHandleRange();
 
   // Set discovery handle to DIS service
-  Bluefruit.Discovery.setHandleRange(_hdl_range);
+  nrf52bot_ble.Discovery.setHandleRange(_hdl_range);
 
   BLEClientCharacteristic chr(uuid);
   chr.begin(this);
 
-  if ( Bluefruit.Discovery.discoverCharacteristic(_conn_hdl, chr) )
+  if ( nrf52bot_ble.Discovery.discoverCharacteristic(_conn_hdl, chr) )
   {
     count = chr.read(buffer, bufsize);
   }
 
   // Set back
-  Bluefruit.Discovery.setHandleRange(bck_range);
+  nrf52bot_ble.Discovery.setHandleRange(bck_range);
 
   return count;
 }

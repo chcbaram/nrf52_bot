@@ -36,8 +36,8 @@
 #ifndef BLEADVERTISING_H_
 #define BLEADVERTISING_H_
 
+#include <nrf52botBLE_common.h>
 #include "hw.h"
-#include "bluefruit_common.h"
 #include "BLEClientService.h"
 
 #include "BLEUuid.h"

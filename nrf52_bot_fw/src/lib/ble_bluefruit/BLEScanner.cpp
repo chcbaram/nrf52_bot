@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 BLEScanner::BLEScanner(void)
 {
@@ -121,7 +121,7 @@ bool BLEScanner::start(uint16_t timeout)
 
   VERIFY_STATUS( sd_ble_gap_scan_start(&_param, &_report_data), false );
 
-  Bluefruit._startConnLed(); // start blinking
+  nrf52bot_ble._startConnLed(); // start blinking
   _runnning = true;
 
   return true;
@@ -139,7 +139,7 @@ bool BLEScanner::stop(void)
   VERIFY_STATUS( sd_ble_gap_scan_stop(), false );
 
   _runnning = false;
-  Bluefruit._stopConnLed(); // stop blinking
+  nrf52bot_ble._stopConnLed(); // stop blinking
 
   return true;
 }
@@ -393,7 +393,7 @@ void BLEScanner::_eventHandler(ble_evt_t* evt)
     break;
 
     case BLE_GAP_EVT_DISCONNECTED:
-      if ( bitRead(_conn_mask, conn_hdl) && (0 == Bluefruit.Central.connected()) )
+      if ( bitRead(_conn_mask, conn_hdl) && (0 == nrf52bot_ble.Central.connected()) )
       {
         bitClear(_conn_mask, conn_hdl);
 
@@ -406,7 +406,7 @@ void BLEScanner::_eventHandler(ble_evt_t* evt)
       if (evt->evt.gap_evt.params.timeout.src == BLE_GAP_TIMEOUT_SRC_SCAN)
       {
         _runnning = false;
-        Bluefruit._stopConnLed();
+        nrf52bot_ble._stopConnLed();
         if (_stop_cb) ada_callback(NULL, 0, _stop_cb);
       }
     break;

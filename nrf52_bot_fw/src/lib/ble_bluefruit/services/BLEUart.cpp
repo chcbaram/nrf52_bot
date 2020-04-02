@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 #include "utility/TimeoutTimer.h"
 
 /* UART Serivce: 6E400001-B5A3-F393-E0A9-E50E24DCCA9E
@@ -144,7 +144,7 @@ void BLEUart::bufferTXD(bool enable)
     if ( _tx_fifo == NULL )
     {
       _tx_fifo = new Adafruit_FIFO(1);
-      _tx_fifo->begin( Bluefruit.getMaxMtu(BLE_GAP_ROLE_PERIPH) );
+      _tx_fifo->begin( nrf52bot_ble.getMaxMtu(BLE_GAP_ROLE_PERIPH) );
     }
   }else
   {
@@ -160,7 +160,7 @@ err_t BLEUart::begin(void)
   // Invoke base class begin()
   VERIFY_STATUS( BLEService::begin() );
 
-  uint16_t max_mtu = Bluefruit.getMaxMtu(BLE_GAP_ROLE_PERIPH);
+  uint16_t max_mtu = nrf52bot_ble.getMaxMtu(BLE_GAP_ROLE_PERIPH);
 
   // Add TXD Characteristic
   _txd.setProperties(CHR_PROPS_NOTIFY);
@@ -185,7 +185,7 @@ err_t BLEUart::begin(void)
 
 bool BLEUart::notifyEnabled(void)
 {
-  return this->notifyEnabled(Bluefruit.connHandle());
+  return this->notifyEnabled(nrf52bot_ble.connHandle());
 }
 
 bool BLEUart::notifyEnabled(uint16_t conn_hdl)
@@ -227,7 +227,7 @@ uint32_t BLEUart::read32(void)
 
 size_t BLEUart::write(uint8_t b)
 {
-  return this->write(Bluefruit.connHandle(), &b, 1);
+  return this->write(nrf52bot_ble.connHandle(), &b, 1);
 }
 
 size_t BLEUart::write(uint16_t conn_hdl, uint8_t b)
@@ -237,12 +237,12 @@ size_t BLEUart::write(uint16_t conn_hdl, uint8_t b)
 
 size_t BLEUart::write(const uint8_t *content, size_t len)
 {
-  return this->write(Bluefruit.connHandle(), content, len);
+  return this->write(nrf52bot_ble.connHandle(), content, len);
 }
 
 size_t BLEUart::write(uint16_t conn_hdl, const uint8_t *content, size_t len)
 {
-  BLEConnection* conn = Bluefruit.Connection(conn_hdl);
+  BLEConnection* conn = nrf52bot_ble.Connection(conn_hdl);
   VERIFY(conn, 0);
 
   // skip if not enabled
@@ -295,12 +295,12 @@ void BLEUart::flush (void)
 
 bool BLEUart::flushTXD (void)
 {
-  return flushTXD(Bluefruit.connHandle());
+  return flushTXD(nrf52bot_ble.connHandle());
 }
 
 bool BLEUart::flushTXD(uint16_t conn_hdl)
 {
-  BLEConnection* conn = Bluefruit.Connection(conn_hdl);
+  BLEConnection* conn = nrf52bot_ble.Connection(conn_hdl);
   VERIFY(conn);
 
   uint16_t const gatt_mtu = conn->getMtu() - 3;

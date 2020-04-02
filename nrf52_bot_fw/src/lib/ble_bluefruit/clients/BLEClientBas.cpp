@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 BLEClientBas::BLEClientBas(void)
   : BLEClientService(UUID16_SVC_BATTERY), _battery(UUID16_CHR_BATTERY_LEVEL)
@@ -59,7 +59,7 @@ bool BLEClientBas::discover(uint16_t conn_handle)
   _conn_hdl = BLE_CONN_HANDLE_INVALID; // make as invalid until we found all chars
 
   // Discover TXD, RXD characteristics
-  VERIFY( 1 == Bluefruit.Discovery.discoverCharacteristic(conn_handle, _battery) );
+  VERIFY( 1 == nrf52bot_ble.Discovery.discoverCharacteristic(conn_handle, _battery) );
 
   _conn_hdl = conn_handle;
   return true;

@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 void BLEBeacon::_init(void)
 {
@@ -88,7 +88,7 @@ void BLEBeacon::setRssiAt1m(int8_t rssi)
 
 bool BLEBeacon::start(void)
 {
-  return start(Bluefruit.Advertising);
+  return start(nrf52bot_ble.Advertising);
 }
 
 bool BLEBeacon::start(BLEAdvertising& adv)

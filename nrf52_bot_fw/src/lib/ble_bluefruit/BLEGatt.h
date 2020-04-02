@@ -36,9 +36,8 @@
 #ifndef BLEGATT_H_
 #define BLEGATT_H_
 
+#include <nrf52botBLE_common.h>
 #include "hw.h"
-#include "bluefruit_common.h"
-
 #include "BLEUuid.h"
 #include "BLECharacteristic.h"
 #include "BLEClientCharacteristic.h"

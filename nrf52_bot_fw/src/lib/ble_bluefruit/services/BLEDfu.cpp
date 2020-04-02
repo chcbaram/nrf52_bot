@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 #define DFU_REV_APPMODE     0x0001
 
@@ -92,7 +92,7 @@ static void bledfu_control_wr_authorize_cb(uint16_t conn_hdl, BLECharacteristic*
        (request->op != BLE_GATTS_OP_EXEC_WRITE_REQ_NOW) &&
        (request->op != BLE_GATTS_OP_EXEC_WRITE_REQ_CANCEL))
   {
-    BLEConnection* conn = Bluefruit.Connection(conn_hdl);
+    BLEConnection* conn = nrf52bot_ble.Connection(conn_hdl);
 
     ble_gatts_rw_authorize_reply_params_t reply = { .type = BLE_GATTS_AUTHORIZE_TYPE_WRITE };
 
@@ -153,7 +153,7 @@ static void bledfu_control_wr_authorize_cb(uint16_t conn_hdl, BLECharacteristic*
       peer_data->crc16 = crc16((uint8_t*) peer_data, offsetof(peer_data_t, crc16));
 
       // Initiate DFU Sequence and reboot into DFU OTA mode
-      Bluefruit.Advertising.restartOnDisconnect(false);
+      nrf52bot_ble.Advertising.restartOnDisconnect(false);
       conn->disconnect();
 
       // Set GPReset to DFU OTA

@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 BLEClientHidAdafruit::BLEClientHidAdafruit(void)
  : BLEClientService(UUID16_SVC_HUMAN_INTERFACE_DEVICE),
@@ -102,7 +102,7 @@ bool BLEClientHidAdafruit::discover(uint16_t conn_handle)
   _conn_hdl = BLE_CONN_HANDLE_INVALID; // make as invalid until we found all chars
 
   // Discover all characteristics
-  Bluefruit.Discovery.discoverCharacteristic(conn_handle, _protcol_mode, _kbd_boot_input, _kbd_boot_output, _mse_boot_input, _hid_info, _hid_control);
+  nrf52bot_ble.Discovery.discoverCharacteristic(conn_handle, _protcol_mode, _kbd_boot_input, _kbd_boot_output, _mse_boot_input, _hid_info, _hid_control);
 
   VERIFY( _protcol_mode.discovered() && _hid_info.discovered() && _hid_control.discovered() );
   VERIFY ( keyboardPresent() || mousePresent() );

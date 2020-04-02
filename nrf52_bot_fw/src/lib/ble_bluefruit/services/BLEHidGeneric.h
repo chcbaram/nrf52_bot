@@ -36,7 +36,7 @@
 #ifndef BLEHIDGENERIC_H_
 #define BLEHIDGENERIC_H_
 
-#include "bluefruit_common.h"
+#include "nrf52botBLE_common.h"
 
 #include "BLECharacteristic.h"
 #include "BLEService.h"

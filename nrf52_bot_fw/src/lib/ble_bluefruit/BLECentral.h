@@ -36,10 +36,10 @@
 #ifndef BLECENTRAL_H_
 #define BLECENTRAL_H_
 
+#include <nrf52botBLE_common.h>
 #include "hw.h"
-#include "bluefruit_common.h"
 
-class AdafruitBluefruit;
+class nrf52botBLE;
 
 class BLECentral
 {
@@ -77,7 +77,7 @@ class BLECentral
     ble_connect_callback_t _connect_cb;
     ble_disconnect_callback_t _disconnect_cb;
 
-    friend class AdafruitBluefruit;
+    friend class nrf52botBLE;
 };
 
 

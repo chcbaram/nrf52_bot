@@ -37,7 +37,7 @@
 #ifndef BLECLIENTBAS_H_
 #define BLECLIENTBAS_H_
 
-#include "bluefruit_common.h"
+#include "nrf52botBLE_common.h"
 #include "BLEClientCharacteristic.h"
 #include "BLEClientService.h"
 

@@ -36,8 +36,8 @@
 #ifndef BLEDISCOVERY_H_
 #define BLEDISCOVERY_H_
 
+#include <nrf52botBLE_common.h>
 #include "hw.h"
-#include "bluefruit_common.h"
 #include "BLEClientCharacteristic.h"
 
 #include "BLEUuid.h"
@@ -109,7 +109,7 @@ class BLEDiscovery
     bool     _discoverService(uint16_t conn_handle, BLEClientService& svc, uint16_t start_handle = 1);
     uint16_t _discoverDescriptor(uint16_t conn_handle, ble_gattc_evt_desc_disc_rsp_t* disc_desc, uint16_t bufsize, ble_gattc_handle_range_t hdl_range);
 
-    friend class AdafruitBluefruit;
+    friend class nrf52botBLE;
 };
 
 #endif /* BLEDISCOVERY_H_ */

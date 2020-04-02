@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 #include "utility/bonding.h"
 
 /**
@@ -53,7 +53,7 @@ BLECentral::BLECentral(void)
 void BLECentral::begin(void)
 {
   // Central will very likely use Discovery
-  Bluefruit.Discovery.begin();
+  nrf52bot_ble.Discovery.begin();
 }
 
 /*------------------------------------------------------------------*/
@@ -75,7 +75,7 @@ bool BLECentral::setConnIntervalMS (uint16_t min_ms, uint16_t max_ms)
 bool BLECentral::connect(const ble_gap_addr_t* peer_addr)
 {
   // Connect with default connection parameter
-  VERIFY_STATUS( sd_ble_gap_connect(peer_addr, Bluefruit.Scanner.getParams(), &_conn_param, CONN_CFG_CENTRAL), false );
+  VERIFY_STATUS( sd_ble_gap_connect(peer_addr, nrf52bot_ble.Scanner.getParams(), &_conn_param, CONN_CFG_CENTRAL), false );
 
   return true;
 }
@@ -92,7 +92,7 @@ bool BLECentral::connect(const ble_gap_evt_adv_report_t* adv_report)
  */
 bool BLECentral::connected(uint16_t conn_hdl)
 {
-  BLEConnection* conn = Bluefruit.Connection(conn_hdl);
+  BLEConnection* conn = nrf52bot_ble.Connection(conn_hdl);
   return conn && conn->connected() && (conn->getRole() == BLE_GAP_ROLE_CENTRAL);
 }
 
@@ -126,7 +126,7 @@ void BLECentral::clearBonds(void)
 }
 
 /**
- * Event is forwarded from Bluefruit Poll() method
+ * Event is forwarded from nrf52bot_ble Poll() method
  * @param event
  */
 void BLECentral::_eventHandler(ble_evt_t* evt)

@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 // GCC 5x new feature to detect optional include
 #ifdef __has_include
@@ -156,7 +156,7 @@ err_t BLEMidi::begin(void)
   VERIFY_STATUS( _io.begin() );
 
   // Attempt to change the connection interval to 11.25-15 ms when starting HID
-  Bluefruit.Periph.setConnInterval(9, 12);
+  nrf52bot_ble.Periph.setConnInterval(9, 12);
 
   return ERROR_NONE;
 }

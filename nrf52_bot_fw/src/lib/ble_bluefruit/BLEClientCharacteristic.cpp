@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 void BLEClientCharacteristic::_init(void)
 {
@@ -66,7 +66,7 @@ BLEClientCharacteristic::BLEClientCharacteristic(BLEUuid bleuuid)
 BLEClientCharacteristic::~BLEClientCharacteristic()
 {
   _adamsg.stop();
-  Bluefruit.Gatt._removeCharacteristic(this);
+  nrf52bot_ble.Gatt._removeCharacteristic(this);
 }
 
 void BLEClientCharacteristic::begin(BLEClientService* parent_svc)
@@ -77,8 +77,8 @@ void BLEClientCharacteristic::begin(BLEClientService* parent_svc)
   // Use the last (discovered) service as parent if not provided
   _service = ( parent_svc == NULL ) ? BLEClientService::lastService : parent_svc;
 
-  // Register to Bluefruit (required for callback and write response)
-  (void) Bluefruit.Gatt._addCharacteristic(this);
+  // Register to nrf52bot_ble (required for callback and write response)
+  (void) nrf52bot_ble.Gatt._addCharacteristic(this);
 
   _adamsg.begin(true);
 }
@@ -96,15 +96,15 @@ void BLEClientCharacteristic::disconnect(void)
 
 bool BLEClientCharacteristic::discover(void)
 {
-  ble_gattc_handle_range_t bck_range = Bluefruit.Discovery.getHandleRange();
+  ble_gattc_handle_range_t bck_range = nrf52bot_ble.Discovery.getHandleRange();
 
   // Set discovery handle to parent's service
-  Bluefruit.Discovery.setHandleRange( _service->getHandleRange() );
+  nrf52bot_ble.Discovery.setHandleRange( _service->getHandleRange() );
 
-  bool result = Bluefruit.Discovery.discoverCharacteristic( _service->connHandle(), *this) > 0;
+  bool result = nrf52bot_ble.Discovery.discoverCharacteristic( _service->connHandle(), *this) > 0;
 
   // Set back to previous
-  Bluefruit.Discovery.setHandleRange(bck_range);
+  nrf52bot_ble.Discovery.setHandleRange(bck_range);
 
   return result;
 }
@@ -145,7 +145,7 @@ bool BLEClientCharacteristic::_discoverDescriptor(uint16_t conn_handle, ble_gatt
     ble_gattc_desc_t descs[MAX_DESCIRPTORS];
   }disc_rsp;
 
-  uint16_t count = Bluefruit.Discovery._discoverDescriptor(conn_handle, (ble_gattc_evt_desc_disc_rsp_t*) &disc_rsp, sizeof(disc_rsp), hdl_range);
+  uint16_t count = nrf52bot_ble.Discovery._discoverDescriptor(conn_handle, (ble_gattc_evt_desc_disc_rsp_t*) &disc_rsp, sizeof(disc_rsp), hdl_range);
 
   // only care CCCD for now
   for(uint16_t i=0; i<count; i++)
@@ -170,7 +170,7 @@ uint16_t BLEClientCharacteristic::read(void* buffer, uint16_t bufsize)
 {
   VERIFY( _chr.char_props.read, 0 );
 
-  BLEConnection* conn = Bluefruit.Connection( _service->connHandle() );
+  BLEConnection* conn = nrf52bot_ble.Connection( _service->connHandle() );
   VERIFY(conn, 0);
 
   uint16_t const max_payload = conn->getMtu() - 3;
@@ -207,7 +207,7 @@ uint16_t BLEClientCharacteristic::write_resp(const void* data, uint16_t len)
 {
   VERIFY( _chr.char_props.write, 0 );
 
-  BLEConnection* conn = Bluefruit.Connection( _service->connHandle() );
+  BLEConnection* conn = nrf52bot_ble.Connection( _service->connHandle() );
   VERIFY(conn, 0);
 
   uint16_t const max_payload = conn->getMtu() - 3;
@@ -283,7 +283,7 @@ uint16_t BLEClientCharacteristic::write(const void* data, uint16_t len)
 {
 //  VERIFY( _chr.char_props.write_wo_resp, 0 );
 
-  BLEConnection* conn = Bluefruit.Connection( _service->connHandle() );
+  BLEConnection* conn = nrf52bot_ble.Connection( _service->connHandle() );
   VERIFY(conn, 0);
 
   uint16_t const max_payload = conn->getMtu() - 3;
@@ -364,7 +364,7 @@ bool BLEClientCharacteristic::writeCCCD(uint16_t value)
   };
 
   // TODO only Write without response consume a TX buffer
-  BLEConnection* conn = Bluefruit.Connection(conn_handle);
+  BLEConnection* conn = nrf52bot_ble.Connection(conn_handle);
   VERIFY( conn && conn->getWriteCmdPacket() );
 
   VERIFY_STATUS( sd_ble_gattc_write(conn_handle, &param), false );
@@ -461,7 +461,7 @@ void BLEClientCharacteristic::_eventHandler(ble_evt_t* evt)
       }
       else if ( wr_rsp->write_op == BLE_GATT_OP_PREP_WRITE_REQ)
       {
-        BLEConnection* conn = Bluefruit.Connection( _service->connHandle() );
+        BLEConnection* conn = nrf52bot_ble.Connection( _service->connHandle() );
 
         uint16_t const max_payload = conn->getMtu() - 3;
         uint16_t packet_len = min16(_adamsg.remaining, max_payload-2);
@@ -510,7 +510,7 @@ void BLEClientCharacteristic::_eventHandler(ble_evt_t* evt)
 
     case BLE_GATTC_EVT_READ_RSP:
     {
-      BLEConnection* conn = Bluefruit.Connection( _service->connHandle() );
+      BLEConnection* conn = nrf52bot_ble.Connection( _service->connHandle() );
 
       uint16_t const max_payload = conn->getMtu() - 3;
       ble_gattc_evt_read_rsp_t* rd_rsp = (ble_gattc_evt_read_rsp_t*) &evt->evt.gattc_evt.params.read_rsp;

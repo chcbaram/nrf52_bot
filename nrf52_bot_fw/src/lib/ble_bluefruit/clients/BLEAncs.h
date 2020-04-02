@@ -37,7 +37,7 @@
 #define BLEANCS_H_
 
 #include "../BLEClientCharacteristic.h"
-#include "bluefruit_common.h"
+#include "nrf52botBLE_common.h"
 
 #include "BLEClientService.h"
 

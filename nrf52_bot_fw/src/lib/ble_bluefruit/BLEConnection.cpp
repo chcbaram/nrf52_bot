@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 //--------------------------------------------------------------------+
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
@@ -118,7 +118,7 @@ ble_gap_addr_t BLEConnection::getPeerAddr (void)
 
 uint16_t BLEConnection::getPeerName(char* buf, uint16_t bufsize)
 {
-  return Bluefruit.Gatt.readCharByUuid(_conn_hdl, BLEUuid(BLE_UUID_GAP_CHARACTERISTIC_DEVICE_NAME), buf, bufsize);
+  return nrf52bot_ble.Gatt.readCharByUuid(_conn_hdl, BLEUuid(BLE_UUID_GAP_CHARACTERISTIC_DEVICE_NAME), buf, bufsize);
 }
 
 static inline bool is_tx_power_valid(int8_t power)
@@ -235,7 +235,7 @@ bool BLEConnection::requestPairing(void)
   // skip if already paired
   if ( _paired ) return true;
 
-  ble_gap_sec_params_t sec_param = Bluefruit.getSecureParam();
+  ble_gap_sec_params_t sec_param = nrf52bot_ble.getSecureParam();
 
   // on-the-fly semaphore
   _pair_sem = xSemaphoreCreateBinary();
@@ -363,7 +363,7 @@ void BLEConnection::_eventHandler(ble_evt_t* evt)
           }
       };
 
-      ble_gap_sec_params_t sec_param = Bluefruit.getSecureParam();
+      ble_gap_sec_params_t sec_param = nrf52bot_ble.getSecureParam();
       VERIFY_STATUS(sd_ble_gap_sec_params_reply(_conn_hdl,
                                                 BLE_GAP_SEC_STATUS_SUCCESS,
                                                 _role == BLE_GAP_ROLE_PERIPH ? &sec_param : NULL,
@@ -462,7 +462,7 @@ void BLEConnection::_eventHandler(ble_evt_t* evt)
     //------------- MTU -------------//
     case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
     {
-      uint16_t const max_mtu = Bluefruit.getMaxMtu(_role);
+      uint16_t const max_mtu = nrf52bot_ble.getMaxMtu(_role);
       _mtu = minof(evt->evt.gatts_evt.params.exchange_mtu_request.client_rx_mtu, max_mtu);
 
       VERIFY_STATUS( sd_ble_gatts_exchange_mtu_reply(_conn_hdl, _mtu), );

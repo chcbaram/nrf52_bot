@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 #include "utility/utilities.h"
 
 BLEDis::BLEDis(void)

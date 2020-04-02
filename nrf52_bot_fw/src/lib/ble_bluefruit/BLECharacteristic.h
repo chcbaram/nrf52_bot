@@ -36,11 +36,11 @@
 #ifndef BLECHARACTERISTIC_H_
 #define BLECHARACTERISTIC_H_
 
-#include "bluefruit_common.h"
+#include <nrf52botBLE_common.h>
 #include "BLEUuid.h"
 
 // Forward declaration
-class AdafruitBluefruit;
+class nrf52botBLE;
 class BLEService;
 
 enum BleSecurityMode

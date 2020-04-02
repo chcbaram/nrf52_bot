@@ -37,8 +37,8 @@
 #ifndef BLEPERIPH_H_
 #define BLEPERIPH_H_
 
+#include <nrf52botBLE_common.h>
 #include "hw.h"
-#include "bluefruit_common.h"
 
 class BLEPeriph
 {
@@ -73,7 +73,7 @@ class BLEPeriph
     ble_connect_callback_t _connect_cb;
     ble_disconnect_callback_t _disconnect_cb;
 
-    friend class AdafruitBluefruit;
+    friend class nrf52botBLE;
 };
 
 #endif /* BLEPERIPH_H_ */

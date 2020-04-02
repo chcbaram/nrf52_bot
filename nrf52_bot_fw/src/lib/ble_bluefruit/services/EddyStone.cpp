@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 /*------------------------------------------------------------------*/
 /* EddyStone URL
@@ -171,10 +171,10 @@ bool EddyStoneUrl::start(void)
   }
 
   // Add UUID16 list with EddyStone
-  VERIFY ( Bluefruit.Advertising.addUuid(UUID16_SVC_EDDYSTONE) );
+  VERIFY ( nrf52bot_ble.Advertising.addUuid(UUID16_SVC_EDDYSTONE) );
 
   // Add Eddystone Service Data
-  VERIFY ( Bluefruit.Advertising.addData(BLE_GAP_AD_TYPE_SERVICE_DATA, &eddy, len + 5) );
+  VERIFY ( nrf52bot_ble.Advertising.addData(BLE_GAP_AD_TYPE_SERVICE_DATA, &eddy, len + 5) );
 
   return true;
 }

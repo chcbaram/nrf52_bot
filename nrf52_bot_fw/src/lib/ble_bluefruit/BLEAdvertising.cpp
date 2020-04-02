@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 /*------------------------------------------------------------------*/
 /* BLEAdvertisingData shared between ADV and ScanResponse
@@ -180,7 +180,7 @@ bool BLEAdvertisingData::addName(void)
   char name[BLE_GAP_ADV_SET_DATA_SIZE_MAX+1];
 
   uint8_t type = BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME;
-  uint8_t len  = Bluefruit.getName(name, sizeof(name));
+  uint8_t len  = nrf52bot_ble.getName(name, sizeof(name));
 
   // not enough for full name, chop it
   if (_count + len + 2 > BLE_GAP_ADV_SET_DATA_SIZE_MAX)
@@ -197,7 +197,7 @@ bool BLEAdvertisingData::addName(void)
 // tx power is set by setTxPower
 bool BLEAdvertisingData::addTxPower(void)
 {
-  int8_t tx_power = Bluefruit.getTxPower();
+  int8_t tx_power = nrf52bot_ble.getTxPower();
   return addData(BLE_GAP_AD_TYPE_TX_POWER_LEVEL, &tx_power, 1);
 }
 
@@ -358,13 +358,13 @@ bool BLEAdvertising::_start(uint16_t interval, uint16_t timeout)
   static ble_gap_adv_data_t gap_adv =
   {
       .adv_data      = { .p_data = _data, .len = _count },
-      .scan_rsp_data = { .p_data = Bluefruit.ScanResponse.getData(), .len = Bluefruit.ScanResponse.count() }
+      .scan_rsp_data = { .p_data = nrf52bot_ble.ScanResponse.getData(), .len = nrf52bot_ble.ScanResponse.count() }
   };
   VERIFY_STATUS( sd_ble_gap_adv_set_configure(&_hdl, &gap_adv, &adv_para), false );
-  VERIFY_STATUS( sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, _hdl, Bluefruit.getTxPower() ), false );
+  VERIFY_STATUS( sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, _hdl, nrf52bot_ble.getTxPower() ), false );
   VERIFY_STATUS( sd_ble_gap_adv_start(_hdl, CONN_CFG_PERIPHERAL), false );
 
-  Bluefruit._startConnLed(); // start blinking
+  nrf52bot_ble._startConnLed(); // start blinking
   _runnning        = true;
   _active_interval = interval;
 
@@ -379,7 +379,7 @@ bool BLEAdvertising::start(uint16_t timeout)
 
   // Initially advertising in fast mode
   // Fast mode blink 2x than slow mode
-  Bluefruit.setConnLedInterval(CFG_ADV_BLINKY_INTERVAL/2);
+  nrf52bot_ble.setConnLedInterval(CFG_ADV_BLINKY_INTERVAL/2);
   VERIFY( _start(_fast_interval, _fast_timeout) );
 
   return true;
@@ -390,7 +390,7 @@ bool BLEAdvertising::stop(void)
   VERIFY_STATUS( sd_ble_gap_adv_stop(_hdl), false);
 
   _runnning = false;
-  Bluefruit._stopConnLed(); // stop blinking
+  nrf52bot_ble._stopConnLed(); // stop blinking
 
   return true;
 }
@@ -417,7 +417,7 @@ void BLEAdvertising::_eventHandler(ble_evt_t* evt)
     break;
 
     case BLE_GAP_EVT_DISCONNECTED:
-      if ( bitRead(_conn_mask, conn_hdl) && (0 == Bluefruit.Periph.connected()) )
+      if ( bitRead(_conn_mask, conn_hdl) && (0 == nrf52bot_ble.Periph.connected()) )
       {
         bitClear(_conn_mask, conn_hdl);
 
@@ -432,7 +432,7 @@ void BLEAdvertising::_eventHandler(ble_evt_t* evt)
         _runnning = false;
 
         // If still advertising, it is only in slow mode --> blink normal
-        Bluefruit.setConnLedInterval(CFG_ADV_BLINKY_INTERVAL);
+        nrf52bot_ble.setConnLedInterval(CFG_ADV_BLINKY_INTERVAL);
 
         if ( _stop_timeout == 0 )
         {
@@ -453,7 +453,7 @@ void BLEAdvertising::_eventHandler(ble_evt_t* evt)
           }else
           {
             // Stop advertising
-            Bluefruit._stopConnLed(); // stop blinking
+            nrf52bot_ble._stopConnLed(); // stop blinking
 
             // invoke stop callback
             if (_stop_cb) ada_callback(NULL, 0, _stop_cb);

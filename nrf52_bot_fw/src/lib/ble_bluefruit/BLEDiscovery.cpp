@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 BLEDiscovery::BLEDiscovery(void)
   : _adamsg()

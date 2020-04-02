@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 enum
 {
@@ -213,7 +213,7 @@ err_t BLEHidAdafruit::begin(void)
   VERIFY_STATUS( BLEHidGeneric::begin() );
 
   // Attempt to change the connection interval to 11.25-15 ms when starting HID
-  Bluefruit.Periph.setConnInterval(9, 12);
+  nrf52bot_ble.Periph.setConnInterval(9, 12);
 
   return ERROR_NONE;
 }

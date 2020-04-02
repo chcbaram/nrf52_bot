@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 void blects_central_notify_cb(BLEClientCharacteristic* chr, uint8_t* data, uint16_t len);
 
@@ -70,7 +70,7 @@ bool BLEClientCts::discover(uint16_t conn_handle)
   _conn_hdl = BLE_CONN_HANDLE_INVALID; // make as invalid until we found all chars
 
   // Discover characteristics
-  Bluefruit.Discovery.discoverCharacteristic(conn_handle, _cur_time, _local_info);
+  nrf52bot_ble.Discovery.discoverCharacteristic(conn_handle, _cur_time, _local_info);
 
   // Current Time chars is mandatory
   VERIFY( _cur_time.valueHandle() != BLE_GATT_HANDLE_INVALID, false);

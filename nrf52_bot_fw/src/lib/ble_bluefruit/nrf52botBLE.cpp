@@ -1,6 +1,6 @@
 /**************************************************************************/
 /*!
-    @file     bluefruit.cpp
+    @file     nrf52botBLE.cpp
     @author   hathach (tinyusb.org)
 
     @section LICENSE
@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 #include "utility/bonding.h"
 
 #ifndef CFG_BLE_TX_POWER_LEVEL
@@ -80,7 +80,7 @@ void usb_softdevice_post_enable(void)
 
 #endif
 
-AdafruitBluefruit Bluefruit;
+nrf52botBLE nrf52bot_ble;
 
 /*------------------------------------------------------------------*/
 /* PROTOTYPTES
@@ -96,7 +96,7 @@ void adafruit_soc_task(void* arg);
 /*------------------------------------------------------------------*/
 /* INTERNAL FUNCTION
  *------------------------------------------------------------------*/
-static void bluefruit_blinky_cb( TimerHandle_t xTimer )
+static void nrf52botBLE_blinky_cb( TimerHandle_t xTimer )
 {
   (void) xTimer;
   //TODO:
@@ -128,7 +128,7 @@ static void nrf_error_cb(uint32_t id, uint32_t pc, uint32_t info)
 }
 
 // Constructor
-AdafruitBluefruit::AdafruitBluefruit(void)
+nrf52botBLE::nrf52botBLE(void)
 {
   /*------------------------------------------------------------------*/
   /*  SoftDevice Default Configuration
@@ -189,22 +189,22 @@ AdafruitBluefruit::AdafruitBluefruit(void)
                 });
 }
 
-void AdafruitBluefruit::configServiceChanged(bool changed)
+void nrf52botBLE::configServiceChanged(bool changed)
 {
   _sd_cfg.service_changed = (changed ? 1 : 0);
 }
 
-void AdafruitBluefruit::configUuid128Count(uint8_t  uuid128_max)
+void nrf52botBLE::configUuid128Count(uint8_t  uuid128_max)
 {
   _sd_cfg.uuid128_max = uuid128_max;
 }
 
-void AdafruitBluefruit::configAttrTableSize(uint32_t attr_table_size)
+void nrf52botBLE::configAttrTableSize(uint32_t attr_table_size)
 {
   _sd_cfg.attr_table_size = align4( maxof(attr_table_size, (uint32_t)(BLE_GATTS_ATTR_TAB_SIZE_MIN)) );
 }
 
-void AdafruitBluefruit::configPrphConn(uint16_t mtu_max, uint16_t event_len, uint8_t hvn_qsize, uint8_t wrcmd_qsize)
+void nrf52botBLE::configPrphConn(uint16_t mtu_max, uint16_t event_len, uint8_t hvn_qsize, uint8_t wrcmd_qsize)
 {
   _sd_cfg.prph.mtu_max     = maxof(mtu_max, BLE_GATT_ATT_MTU_DEFAULT);;
   _sd_cfg.prph.event_len   = maxof(event_len, BLE_GAP_EVENT_LENGTH_MIN);
@@ -212,7 +212,7 @@ void AdafruitBluefruit::configPrphConn(uint16_t mtu_max, uint16_t event_len, uin
   _sd_cfg.prph.wrcmd_qsize = wrcmd_qsize;
 }
 
-void AdafruitBluefruit::configCentralConn(uint16_t mtu_max, uint16_t event_len, uint8_t hvn_qsize, uint8_t wrcmd_qsize)
+void nrf52botBLE::configCentralConn(uint16_t mtu_max, uint16_t event_len, uint8_t hvn_qsize, uint8_t wrcmd_qsize)
 {
   _sd_cfg.central.mtu_max     = maxof(mtu_max, BLE_GATT_ATT_MTU_DEFAULT);;
   _sd_cfg.central.event_len   = maxof(event_len, BLE_GAP_EVENT_LENGTH_MIN);
@@ -221,7 +221,7 @@ void AdafruitBluefruit::configCentralConn(uint16_t mtu_max, uint16_t event_len, 
 
 }
 
-void AdafruitBluefruit::configPrphBandwidth(uint8_t bw)
+void nrf52botBLE::configPrphBandwidth(uint8_t bw)
 {
   /* Note default value from SoftDevice are
    * MTU = 23, Event Len = 3, HVN QSize = 1, WrCMD QSize =1
@@ -250,7 +250,7 @@ void AdafruitBluefruit::configPrphBandwidth(uint8_t bw)
   }
 }
 
-void AdafruitBluefruit::configCentralBandwidth(uint8_t bw)
+void nrf52botBLE::configCentralBandwidth(uint8_t bw)
 {
   /* Note default value from SoftDevice are
    * MTU = 23, Event Len = 3, HVN QSize = 1, WrCMD QSize =1
@@ -279,7 +279,7 @@ void AdafruitBluefruit::configCentralBandwidth(uint8_t bw)
   }
 }
 
-bool AdafruitBluefruit::begin(uint8_t prph_count, uint8_t central_count)
+bool nrf52botBLE::begin(uint8_t prph_count, uint8_t central_count)
 {
   _prph_count    = prph_count;
   _central_count = central_count;
@@ -481,7 +481,7 @@ bool AdafruitBluefruit::begin(uint8_t prph_count, uint8_t central_count)
   NVIC_EnableIRQ(SD_EVT_IRQn); // enable SD interrupt
 
   // Create Timer for led advertising blinky
-  _led_blink_th = xTimerCreate(NULL, ms2tick(CFG_ADV_BLINKY_INTERVAL/2), true, NULL, bluefruit_blinky_cb);
+  _led_blink_th = xTimerCreate(NULL, ms2tick(CFG_ADV_BLINKY_INTERVAL/2), true, NULL, nrf52botBLE_blinky_cb);
 
   // Initialize bonding
   bond_init();
@@ -492,7 +492,7 @@ bool AdafruitBluefruit::begin(uint8_t prph_count, uint8_t central_count)
 /*------------------------------------------------------------------*/
 /* General Functions
  *------------------------------------------------------------------*/
-ble_gap_addr_t AdafruitBluefruit::getAddr (void)
+ble_gap_addr_t nrf52botBLE::getAddr (void)
 {
   ble_gap_addr_t gap_addr;
   sd_ble_gap_addr_get(&gap_addr);
@@ -504,7 +504,7 @@ ble_gap_addr_t AdafruitBluefruit::getAddr (void)
  * @param mac address
  * @return Address type e.g BLE_GAP_ADDR_TYPE_RANDOM_STATIC
  */
-uint8_t AdafruitBluefruit::getAddr (uint8_t mac[6])
+uint8_t nrf52botBLE::getAddr (uint8_t mac[6])
 {
   ble_gap_addr_t gap_addr;
   sd_ble_gap_addr_get(&gap_addr);
@@ -513,19 +513,19 @@ uint8_t AdafruitBluefruit::getAddr (uint8_t mac[6])
   return gap_addr.addr_type;
 }
 
-bool AdafruitBluefruit::setAddr (ble_gap_addr_t* gap_addr)
+bool nrf52botBLE::setAddr (ble_gap_addr_t* gap_addr)
 {
   VERIFY_STATUS( sd_ble_gap_addr_set(gap_addr), false );
   return true;
 }
 
-void AdafruitBluefruit::setName (char const * str)
+void nrf52botBLE::setName (char const * str)
 {
   ble_gap_conn_sec_mode_t sec_mode = BLE_SECMODE_OPEN;
   sd_ble_gap_device_name_set(&sec_mode, (uint8_t const *) str, strlen(str));
 }
 
-uint8_t AdafruitBluefruit::getName(char* name, uint16_t bufsize)
+uint8_t nrf52botBLE::getName(char* name, uint16_t bufsize)
 {
   VERIFY_STATUS( sd_ble_gap_device_name_get((uint8_t*) name, &bufsize), 0);
   return bufsize;
@@ -548,24 +548,24 @@ static inline bool is_tx_power_valid(int8_t power)
   return false;
 }
 
-bool AdafruitBluefruit::setTxPower(int8_t power)
+bool nrf52botBLE::setTxPower(int8_t power)
 {
   VERIFY(is_tx_power_valid(power));
   _tx_power = power;
   return true;
 }
 
-int8_t AdafruitBluefruit::getTxPower(void)
+int8_t nrf52botBLE::getTxPower(void)
 {
   return _tx_power;
 }
 
-void AdafruitBluefruit::autoConnLed(bool enabled)
+void nrf52botBLE::autoConnLed(bool enabled)
 {
   _led_conn = enabled;
 }
 
-void AdafruitBluefruit::setConnLedInterval(uint32_t ms)
+void nrf52botBLE::setConnLedInterval(uint32_t ms)
 {
   BaseType_t active = xTimerIsTimerActive(_led_blink_th);
   xTimerChangePeriod(_led_blink_th, ms2tick(ms), 0);
@@ -574,12 +574,12 @@ void AdafruitBluefruit::setConnLedInterval(uint32_t ms)
   if ( !active ) xTimerStop(_led_blink_th, 0);
 }
 
-bool AdafruitBluefruit::setAppearance(uint16_t appear)
+bool nrf52botBLE::setAppearance(uint16_t appear)
 {
   return ERROR_NONE == sd_ble_gap_appearance_set(appear);
 }
 
-uint16_t AdafruitBluefruit::getAppearance(void)
+uint16_t nrf52botBLE::getAppearance(void)
 {
   uint16_t appear = 0;
   (void) sd_ble_gap_appearance_get(&appear);
@@ -589,7 +589,7 @@ uint16_t AdafruitBluefruit::getAppearance(void)
 /*------------------------------------------------------------------*/
 /* GAP, Connections and Bonding
  *------------------------------------------------------------------*/
-uint8_t AdafruitBluefruit::connected(void)
+uint8_t nrf52botBLE::connected(void)
 {
   uint8_t count = 0;
   for (uint16_t c=0; c<BLE_MAX_CONNECTION; c++)
@@ -600,13 +600,13 @@ uint8_t AdafruitBluefruit::connected(void)
   return count;
 }
 
-bool AdafruitBluefruit::connected(uint16_t conn_hdl)
+bool nrf52botBLE::connected(uint16_t conn_hdl)
 {
   BLEConnection* conn = this->Connection(conn_hdl);
   return conn && conn->connected();
 }
 
-bool AdafruitBluefruit::disconnect(uint16_t conn_hdl)
+bool nrf52botBLE::disconnect(uint16_t conn_hdl)
 {
   BLEConnection* conn = this->Connection(conn_hdl);
 
@@ -619,40 +619,40 @@ bool AdafruitBluefruit::disconnect(uint16_t conn_hdl)
   return true; // not connected still return true
 }
 
-void AdafruitBluefruit::setEventCallback ( void (*fp) (ble_evt_t*) )
+void nrf52botBLE::setEventCallback ( void (*fp) (ble_evt_t*) )
 {
   _event_cb = fp;
 }
 
-uint16_t AdafruitBluefruit::connHandle(void)
+uint16_t nrf52botBLE::connHandle(void)
 {
   return _conn_hdl;
 }
 
-bool AdafruitBluefruit::connPaired(uint16_t conn_hdl)
+bool nrf52botBLE::connPaired(uint16_t conn_hdl)
 {
-  BLEConnection* conn = Bluefruit.Connection(conn_hdl);
+  BLEConnection* conn = nrf52bot_ble.Connection(conn_hdl);
   return conn && conn->paired();
 }
 
-uint16_t AdafruitBluefruit::getMaxMtu(uint8_t role)
+uint16_t nrf52botBLE::getMaxMtu(uint8_t role)
 {
   return (role == BLE_GAP_ROLE_PERIPH) ? _sd_cfg.prph.mtu_max : _sd_cfg.central.mtu_max;
 }
 
-BLEConnection* AdafruitBluefruit::Connection(uint16_t conn_hdl)
+BLEConnection* nrf52botBLE::Connection(uint16_t conn_hdl)
 {
   return (conn_hdl < BLE_MAX_CONNECTION) ? _connection[conn_hdl] : NULL;
 }
 
-void AdafruitBluefruit::setRssiCallback(rssi_callback_t fp)
+void nrf52botBLE::setRssiCallback(rssi_callback_t fp)
 {
   _rssi_cb = fp;
 }
 
 
 COMMENT_OUT (
-bool AdafruitBluefruit::setPIN(const char* pin)
+bool nrf52botBLE::setPIN(const char* pin)
 {
   VERIFY ( strlen(pin) == BLE_GAP_PASSKEY_LEN );
 
@@ -675,8 +675,8 @@ bool AdafruitBluefruit::setPIN(const char* pin)
 void SD_EVT_IRQHandler(void)
 {
   // Notify both BLE & SOC Task
-  xSemaphoreGiveFromISR(Bluefruit._soc_event_sem, NULL);
-  xSemaphoreGiveFromISR(Bluefruit._ble_event_sem, NULL);
+  xSemaphoreGiveFromISR(nrf52bot_ble._soc_event_sem, NULL);
+  xSemaphoreGiveFromISR(nrf52bot_ble._ble_event_sem, NULL);
 }
 
 /**
@@ -688,7 +688,7 @@ void adafruit_soc_task(void* arg)
 
   while (1)
   {
-    if ( xSemaphoreTake(Bluefruit._soc_event_sem, portMAX_DELAY) )
+    if ( xSemaphoreTake(nrf52bot_ble._soc_event_sem, portMAX_DELAY) )
     {
       uint32_t soc_evt;
       uint32_t err = ERROR_NONE;
@@ -742,7 +742,7 @@ void adafruit_ble_task(void* arg)
 
   while (1)
   {
-    if ( xSemaphoreTake(Bluefruit._ble_event_sem, portMAX_DELAY) )
+    if ( xSemaphoreTake(nrf52bot_ble._ble_event_sem, portMAX_DELAY) )
     {
       uint32_t err = NRF_SUCCESS;
 
@@ -757,7 +757,7 @@ void adafruit_ble_task(void* arg)
         // Handle valid event
         if( NRF_SUCCESS == err)
         {
-          Bluefruit._ble_handler( (ble_evt_t*) ev_buf );
+          nrf52bot_ble._ble_handler( (ble_evt_t*) ev_buf );
         }else if ( NRF_ERROR_NOT_FOUND != err )
         {
           LOG_LV1("BLE", "SD event error %s", dbg_err_str(err));
@@ -771,7 +771,7 @@ void adafruit_ble_task(void* arg)
  * BLE event handler
  * @param evt event
  */
-void AdafruitBluefruit::_ble_handler(ble_evt_t* evt)
+void nrf52botBLE::_ble_handler(ble_evt_t* evt)
 {
   // conn handle has fixed offset for all events
   uint16_t const conn_hdl = evt->evt.common_evt.conn_handle;
@@ -923,19 +923,19 @@ void AdafruitBluefruit::_ble_handler(ble_evt_t* evt)
 /*------------------------------------------------------------------*/
 /* Internal Connection LED
  *------------------------------------------------------------------*/
-void AdafruitBluefruit::_startConnLed(void)
+void nrf52botBLE::_startConnLed(void)
 {
   if (_led_conn) xTimerStart(_led_blink_th, 0);
 }
 
-void AdafruitBluefruit::_stopConnLed(void)
+void nrf52botBLE::_stopConnLed(void)
 {
   xTimerStop(_led_blink_th, 0);
 
   _setConnLed( this->connected() );
 }
 
-void AdafruitBluefruit::_setConnLed (bool on_off)
+void nrf52botBLE::_setConnLed (bool on_off)
 {
   if (_led_conn)
   {
@@ -947,7 +947,7 @@ void AdafruitBluefruit::_setConnLed (bool on_off)
 /*------------------------------------------------------------------*/
 /* Bonds
  *------------------------------------------------------------------*/
-bool AdafruitBluefruit::requestPairing(uint16_t conn_hdl)
+bool nrf52botBLE::requestPairing(uint16_t conn_hdl)
 {
   BLEConnection* conn = this->Connection(conn_hdl);
   VERIFY(conn);
@@ -955,7 +955,7 @@ bool AdafruitBluefruit::requestPairing(uint16_t conn_hdl)
   return conn->requestPairing();
 }
 
-void AdafruitBluefruit::clearBonds(void)
+void nrf52botBLE::clearBonds(void)
 {
   bond_clear_prph();
 }
@@ -966,16 +966,16 @@ void AdafruitBluefruit::clearBonds(void)
 
 void Bluefruit_printInfo(void)
 {
-  Bluefruit.printInfo();
+  nrf52bot_ble.printInfo();
 }
 
-void AdafruitBluefruit::printInfo(void)
+void nrf52botBLE::printInfo(void)
 {
   //TODO:
 //  // Skip if Serial is not initialised
 //  if ( !Serial ) return;
 //
-//  // Skip if Bluefruit.begin() is not called
+//  // Skip if nrf52bot_ble.begin() is not called
 //  if ( _ble_event_sem == NULL ) return;
 //
 //  Serial.println("--------- SoftDevice Config ---------");

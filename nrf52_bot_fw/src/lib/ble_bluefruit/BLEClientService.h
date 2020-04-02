@@ -36,7 +36,7 @@
 #ifndef BLECLIENTSERVICE_H_
 #define BLECLIENTSERVICE_H_
 
-#include "bluefruit_common.h"
+#include <nrf52botBLE_common.h>
 #include "BLEUuid.h"
 
 class BLEClientService

@@ -36,7 +36,7 @@
 #ifndef BLEUUID_H_
 #define BLEUUID_H_
 
-#include "bluefruit_common.h"
+#include <nrf52botBLE_common.h>
 
 class BLEUuid
 {

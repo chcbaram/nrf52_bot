@@ -36,7 +36,7 @@
 #ifndef BLECLIENTHIDADAFRUIT_H_
 #define BLECLIENTHIDADAFRUIT_H_
 
-#include "bluefruit_common.h"
+#include "nrf52botBLE_common.h"
 #include "BLEClientCharacteristic.h"
 #include "BLEClientService.h"
 

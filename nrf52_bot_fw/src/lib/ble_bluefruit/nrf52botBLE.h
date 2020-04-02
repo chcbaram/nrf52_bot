@@ -24,8 +24,8 @@
 #ifndef BLUEFRUIT_H_
 #define BLUEFRUIT_H_
 
+#include <nrf52botBLE_common.h>
 #include "hw.h"
-#include "bluefruit_common.h"
 
 #define CFG_ADV_BLINKY_INTERVAL   500
 
@@ -101,12 +101,12 @@ extern "C"
   void SD_EVT_IRQHandler(void);
 }
 
-class AdafruitBluefruit
+class nrf52botBLE
 {
   public:
     typedef void (*rssi_callback_t) (uint16_t conn_hdl, int8_t rssi);
 
-    AdafruitBluefruit(void); // Constructor
+    nrf52botBLE(void); // Constructor
 
     /*------------------------------------------------------------------*/
     /* Lower Level Classes (Bluefruit.Advertising.*, etc.)
@@ -253,6 +253,6 @@ COMMENT_OUT(
     friend class BLECentral;
 };
 
-extern AdafruitBluefruit Bluefruit;
+extern nrf52botBLE nrf52bot_ble;
 
 #endif

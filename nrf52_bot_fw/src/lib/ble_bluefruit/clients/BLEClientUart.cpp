@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include "nrf52botBLE.h"
 
 void bleuart_central_notify_cb(BLEClientCharacteristic* chr, uint8_t* data, uint16_t len);
 
@@ -83,7 +83,7 @@ bool BLEClientUart::discover(uint16_t conn_handle)
   _conn_hdl = BLE_CONN_HANDLE_INVALID; // make as invalid until we found all chars
 
   // Discover TXD, RXD characteristics
-  VERIFY( 2 == Bluefruit.Discovery.discoverCharacteristic(conn_handle, _rxd, _txd) );
+  VERIFY( 2 == nrf52bot_ble.Discovery.discoverCharacteristic(conn_handle, _rxd, _txd) );
 
   _conn_hdl = conn_handle;
   return true;

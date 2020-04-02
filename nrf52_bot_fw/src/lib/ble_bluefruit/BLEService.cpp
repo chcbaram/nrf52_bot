@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 BLEService* BLEService::lastService = NULL;
 
@@ -69,7 +69,7 @@ err_t BLEService::begin(void)
   VERIFY_STATUS( sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY, &uuid._uuid, &handle) );
 
   lastService = this;
-  (void) Bluefruit.Gatt._addService(this);
+  (void) nrf52bot_ble.Gatt._addService(this);
 
   return ERROR_NONE;
 }

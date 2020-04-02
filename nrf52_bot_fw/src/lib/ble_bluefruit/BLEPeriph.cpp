@@ -34,7 +34,7 @@
 */
 /**************************************************************************/
 
-#include "bluefruit.h"
+#include <nrf52botBLE.h>
 
 // Constructor
 BLEPeriph::BLEPeriph(void)
@@ -63,7 +63,7 @@ bool BLEPeriph::begin(void)
 
 bool BLEPeriph::connected (uint16_t conn_hdl)
 {
-  BLEConnection* conn = Bluefruit.Connection(conn_hdl);
+  BLEConnection* conn = nrf52bot_ble.Connection(conn_hdl);
   return conn && conn->connected() && (conn->getRole() == BLE_GAP_ROLE_PERIPH);
 }
 
