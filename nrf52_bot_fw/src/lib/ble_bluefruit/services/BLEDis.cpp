@@ -36,6 +36,7 @@
 
 #include "nrf52botBLE.h"
 #include "utility/utilities.h"
+#include "BLEDis.h"
 
 BLEDis::BLEDis(void)
   : BLEService(UUID16_SVC_DEVICE_INFORMATION)
@@ -49,7 +50,7 @@ BLEDis::BLEDis(void)
   this->setModel("Feather nRF52832");
 #endif
 
-  this->setSoftwareRev(ARDUINO_BSP_VERSION);
+  this->setSoftwareRev(BSP_VERSION);
   this->setManufacturer("Adafruit Industries");
 }
 

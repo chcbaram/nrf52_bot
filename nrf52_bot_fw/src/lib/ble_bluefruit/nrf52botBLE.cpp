@@ -939,8 +939,7 @@ void nrf52botBLE::_setConnLed (bool on_off)
 {
   if (_led_conn)
   {
-    //TODO:
-//    digitalWrite(LED_BLUE, on_off ? LED_STATE_ON : (1-LED_STATE_ON) );
+    on_off ? ledOn(1):ledOff(1);
   }
 }
 

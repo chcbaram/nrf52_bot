@@ -22,6 +22,7 @@ extern "C" {
 #include "nrf_gpio.h"
 
 
+#define BSP_VERSION "0.0.1"
 
 
 //#define logPrintf(...)    printf(__VA_ARGS__)

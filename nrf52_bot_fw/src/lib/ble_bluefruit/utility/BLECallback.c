@@ -36,6 +36,7 @@
 
 #include <utility/BLECallback.h>
 #include "hw.h"
+#include "rtos.h"
 
 #define INITIAL_QUEUE_DEPTH     64
 
@@ -72,6 +73,13 @@ void ble_callback_task(void* arg)
       rtos_free(cb_data);
     }
   }
+}
+
+
+// Test if in interrupt mode
+static inline bool isInISR(void)
+{
+  return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0 ;
 }
 
 void ble_callback_queue(ble_callback_t* cb_item)
