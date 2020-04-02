@@ -143,8 +143,8 @@ static void threadBLE(void const *argument)
   nrf52bot_ble.Periph.setDisconnectCallback(disconnect_callback);
 
   // Configure and Start Device Information Service
-  bledis.setManufacturer("Adafruit Industries");
-  bledis.setModel("Bluefruit Feather52");
+  bledis.setManufacturer("OROCA organization");
+  bledis.setModel("OROCA nRF52bot");
   bledis.begin();
 
   // Advertising packet
