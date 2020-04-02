@@ -69,7 +69,7 @@ void hwInit(void)
 
 
   // After usbInit()
-  radioInit();
+//  radioInit();
 
 
 }
