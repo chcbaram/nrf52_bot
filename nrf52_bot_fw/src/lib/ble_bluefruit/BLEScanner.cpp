@@ -370,7 +370,7 @@ void BLEScanner::_eventHandler(ble_evt_t* evt)
 
       if ( invoke_cb )
       {
-        if (_rx_cb) ada_callback(evt_report, sizeof(*evt_report), _rx_cb, evt_report);
+        if (_rx_cb) ble_callback(evt_report, sizeof(*evt_report), _rx_cb, evt_report);
       }else
       {
         // continue scanning since report is filtered and callback is not invoked
@@ -407,7 +407,7 @@ void BLEScanner::_eventHandler(ble_evt_t* evt)
       {
         _runnning = false;
         nrf52bot_ble._stopConnLed();
-        if (_stop_cb) ada_callback(NULL, 0, _stop_cb);
+        if (_stop_cb) ble_callback(NULL, 0, _stop_cb);
       }
     break;
 

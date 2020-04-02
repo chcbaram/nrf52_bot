@@ -76,8 +76,7 @@
 //#include "clients/BLEClientBas.h"
 
 //TODO: remove macro below (for temporary)
-#define ada_callback(...) true
-//#include "utility/AdaCallback.h"
+#include "utility/BLECallback.h"
 
 #include "utility/bonding.h"
 

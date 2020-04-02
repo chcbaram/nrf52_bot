@@ -40,7 +40,7 @@
 #ifndef _VERIFY_H_
 #define _VERIFY_H_
 
-// #include "compiler_macro.h"
+#include "compiler_macro.h"
 
 #ifdef __cplusplus
 extern "C"

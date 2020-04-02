@@ -456,7 +456,7 @@ void BLEAdvertising::_eventHandler(ble_evt_t* evt)
             nrf52bot_ble._stopConnLed(); // stop blinking
 
             // invoke stop callback
-            if (_stop_cb) ada_callback(NULL, 0, _stop_cb);
+            if (_stop_cb) ble_callback(NULL, 0, _stop_cb);
           }
         }
       }

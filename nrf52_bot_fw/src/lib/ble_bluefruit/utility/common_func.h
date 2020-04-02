@@ -75,9 +75,6 @@ enum
   ERROR_NONE = 0
 };
 
-#define ATTR_PACKED __attribute__((packed))
-#define ATTR_WEAK __attribute__((weak))
-
 #define lowByte(w) ((uint8_t) ((w) & 0xff))
 #define highByte(w) ((uint8_t) ((w) >> 8))
 

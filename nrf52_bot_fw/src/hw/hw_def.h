@@ -20,6 +20,7 @@
 #define _HW_DEF_RTOS_THREAD_PRI_USB           osPriorityNormal
 #define _HW_DEF_RTOS_THREAD_PRI_LED           osPriorityNormal
 #define _HW_DEF_RTOS_THREAD_PRI_LCD           osPriorityNormal
+#define _HW_DEF_RTOS_THREAD_PRI_BLE_CALLBACK  osPriorityNormal
 
 #define _HW_DEF_RTOS_THREAD_MEM_MAIN          _HW_DEF_RTOS_MEM_SIZE( 6*1024 )
 #define _HW_DEF_RTOS_THREAD_MEM_USB           _HW_DEF_RTOS_MEM_SIZE( 2*1024 )

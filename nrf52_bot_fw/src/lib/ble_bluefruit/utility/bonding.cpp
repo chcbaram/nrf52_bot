@@ -139,7 +139,7 @@ bool bond_save_keys (uint8_t role, uint16_t conn_hdl, bond_keys_t* bkeys)
 {
   //TODO:
   // queue to execute in Ada Callback thread
-//  return ada_callback(bkeys, sizeof(bond_keys_t), bond_save_keys_dfr, role, conn_hdl, bkeys);
+//  return ble_callback(bkeys, sizeof(bond_keys_t), bond_save_keys_dfr, role, conn_hdl, bkeys);
   return false;
 }
 
@@ -201,7 +201,7 @@ bool bond_save_cccd (uint8_t role, uint16_t conn_hdl, uint16_t ediv)
 //  VERIFY(ediv != 0xFFFF);
 //
 //  // queue to execute in Ada Callback thread
-//  return ada_callback(NULL, 0, bond_save_cccd_dfr, role, conn_hdl, ediv);
+//  return ble_callback(NULL, 0, bond_save_cccd_dfr, role, conn_hdl, ediv);
   return false;
 }
 
