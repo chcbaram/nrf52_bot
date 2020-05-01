@@ -47,9 +47,7 @@
 #include "app_error.h"
 #include "nrf_delay.h"
 #include "app_util_platform.h"
-#if APP_TIMER_CONFIG_USE_SCHEDULER
-#include "app_scheduler.h"
-#endif
+
 
 #define RTC1_IRQ_PRI            APP_TIMER_CONFIG_IRQ_PRIORITY               /**< Priority of the RTC1 interrupt (used for checking for timeouts and executing timeout handlers). */
 #define SWI_IRQ_PRI             APP_TIMER_CONFIG_IRQ_PRIORITY               /**< Priority of the SWI  interrupt (used for updating the timer list). */
@@ -365,15 +363,6 @@ static void timer_list_handler_sched(void)
     NVIC_SetPendingIRQ(SWI_IRQn);
 }
 
-#if APP_TIMER_CONFIG_USE_SCHEDULER
-static void timeout_handler_scheduled_exec(void * p_event_data, uint16_t event_size)
-{
-    APP_ERROR_CHECK_BOOL(event_size == sizeof(app_timer_event_t));
-    app_timer_event_t const * p_timer_event = (app_timer_event_t *)p_event_data;
-
-    p_timer_event->timeout_handler(p_timer_event->p_context);
-}
-#endif
 
 /**@brief Function for executing an application timeout handler, either by calling it directly, or
  *        by passing an event to the @ref app_scheduler.
@@ -382,16 +371,7 @@ static void timeout_handler_scheduled_exec(void * p_event_data, uint16_t event_s
  */
 static void timeout_handler_exec(timer_node_t * p_timer)
 {
-#if APP_TIMER_CONFIG_USE_SCHEDULER
-    app_timer_event_t timer_event;
-
-    timer_event.timeout_handler = p_timer->p_timeout_handler;
-    timer_event.p_context       = p_timer->p_context;
-    uint32_t err_code = app_sched_event_put(&timer_event, sizeof(timer_event), timeout_handler_scheduled_exec);
-    APP_ERROR_CHECK(err_code);
-#else
     p_timer->p_timeout_handler(p_timer->p_context);
-#endif
 }
 
 
@@ -732,19 +712,6 @@ static void timer_list_handler(void)
     bool           compare_update = false;
     timer_node_t * p_timer_id_head_old;
 
-#if APP_TIMER_WITH_PROFILER
-    {
-        uint8_t size = m_op_queue.size;
-        uint8_t first = m_op_queue.first;
-        uint8_t last = m_op_queue.last;
-        uint8_t utilization = (first <= last) ? (last - first) : (size + 1 - first + last);
-
-        if (utilization > m_max_user_op_queue_utilization)
-        {
-            m_max_user_op_queue_utilization = utilization;
-        }
-    }
-#endif
 
     // Back up the previous known tick and previous list head
     ticks_previous    = m_ticks_latest;
@@ -942,9 +909,6 @@ ret_code_t app_timer_init(void)
     m_ticks_elapsed_q_read_ind  = 0;
     m_ticks_elapsed_q_write_ind = 0;
 
-#if APP_TIMER_WITH_PROFILER
-    m_max_user_op_queue_utilization   = 0;
-#endif
 
     NVIC_ClearPendingIRQ(SWI_IRQn);
     NVIC_SetPriority(SWI_IRQn, SWI_IRQ_PRI);
@@ -1055,12 +1019,6 @@ uint32_t app_timer_cnt_diff_compute(uint32_t   ticks_to,
     return ticks_diff_get(ticks_to, ticks_from);
 }
 
-#if APP_TIMER_WITH_PROFILER
-uint8_t app_timer_op_queue_utilization_get(void)
-{
-    return m_max_user_op_queue_utilization;
-}
-#endif
 
 void app_timer_pause(void)
 {
