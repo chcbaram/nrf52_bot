@@ -543,6 +543,7 @@ void handler_on_adv_evt(ble_adv_evt_t ble_adv_evt)
       break;
     case BLE_ADV_EVT_IDLE:
       //sleep_mode_enter();
+      ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
       break;
     default:
       break;
