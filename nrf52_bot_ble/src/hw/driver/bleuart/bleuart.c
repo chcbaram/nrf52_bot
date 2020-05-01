@@ -168,7 +168,7 @@ uint32_t bleUartAvailable(void)
 
 bool bleUartSendPacket(uint8_t *p_data, uint16_t length)
 {
-  int32_t ret = 0;
+  bool ret = false;
   uint32_t pre_time;
   uint32_t err_code;
 
@@ -185,6 +185,7 @@ bool bleUartSendPacket(uint8_t *p_data, uint16_t length)
   {
     if (is_tx_ready == true)
     {
+      ret = true;
       break;
     }
     if (millis()-pre_time >= 100)
