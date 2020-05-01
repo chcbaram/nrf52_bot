@@ -94,11 +94,34 @@ volatile static bool is_connected = false;
 volatile static bool is_tx_ready = false;
 
 
+
+#define APP_TIMER_TEST    0
+
+#if APP_TIMER_TEST == 1
+static uint32_t pre_time;
+static app_timer_t timer_data;
+static app_timer_id_t  timer_id = (app_timer_id_t)&timer_data;
+
+
+void update_timeout_handler(void * p_context)
+{
+  uartPrintf(_DEF_UART2, "timeout %d\n", millis()-pre_time);
+  pre_time = millis();
+}
+#endif
+
+
 bool bleUartInit(void)
 {
   uint32_t err_code = 0;
 
   app_timer_init();
+
+#if APP_TIMER_TEST == 1
+  app_timer_create(&timer_id, APP_TIMER_MODE_REPEATED, update_timeout_handler);
+  app_timer_start(timer_id, 10000, NULL);
+  pre_time = millis();
+#endif
 
   err_code |= ble_stack_init();
   err_code |= gap_params_init();
@@ -117,6 +140,15 @@ bool bleUartInit(void)
 
   qbufferCreate(&qbuffer_rx, rx_buf, BLEUART_RX_BUF_LENGTH);
 
+
+
+
+  return true;
+}
+
+bool bleUartUpdate(void)
+{
+  app_timer_update();
   return true;
 }
 

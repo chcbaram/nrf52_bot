@@ -48,6 +48,7 @@ void apMain(void)
     {
       bleUartPrintf("ble rx 0x%X\n", bleUartRead());
     }
+    bleUartUpdate();
   }
 }
 

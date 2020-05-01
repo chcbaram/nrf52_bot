@@ -102,10 +102,7 @@ extern "C" {
  *
  * @return     Number of timer ticks.
  */
-#define APP_TIMER_TICKS(MS)                                \
-            ((uint32_t)ROUNDED_DIV(                        \
-            (MS) * (uint64_t)APP_TIMER_CLOCK_FREQ,         \
-            1000 * (APP_TIMER_CONFIG_RTC_FREQUENCY + 1)))
+#define APP_TIMER_TICKS(MS)  (MS)
 
 
 /**
@@ -258,6 +255,10 @@ void app_timer_pause(void);
  *       application activity.
  */
 void app_timer_resume(void);
+
+
+
+void app_timer_update(void);
 
 #ifdef __cplusplus
 }
