@@ -33,7 +33,7 @@ extern "C" {
 #include "lcd.h"
 #include "radio.h"
 #include "bleuart.h"
-
+#include "bleuart_c.h"
 
 void hwInit(void);
 

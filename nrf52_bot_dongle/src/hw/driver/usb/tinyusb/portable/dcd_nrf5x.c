@@ -563,7 +563,6 @@ static bool is_sd_enabled(void)
 }
 #endif
 
-
 static bool hfclk_running(void)
 {
 #ifdef SOFTDEVICE_PRESENT

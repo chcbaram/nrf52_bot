@@ -517,7 +517,8 @@ void handler_gatt_evt(nrf_ble_gatt_t * p_gatt, nrf_ble_gatt_evt_t const * p_evt)
 
 void handler_nrf_qwr_error(uint32_t nrf_error)
 {
-  APP_ERROR_HANDLER(nrf_error);
+  //TODO: 향후 에러처리 추가함.
+  //APP_ERROR_HANDLER(nrf_error);
 }
 
 void handler_nus_data(ble_nus_evt_t * p_evt)
@@ -564,7 +565,8 @@ void handler_on_conn_params_evt(ble_conn_params_evt_t * p_evt)
 
 void handler_conn_params_error(uint32_t nrf_error)
 {
-  APP_ERROR_HANDLER(nrf_error);
+  //TODO: 향후 에러처리 추가함.
+  //APP_ERROR_HANDLER(nrf_error);
 }
 
 

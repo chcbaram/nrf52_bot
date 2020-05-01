@@ -27,6 +27,8 @@ void apInit(void)
   osThreadCreate(osThread(threadUsb), NULL);
 }
 
+uint8_t buf[255];
+
 void apMain(void)
 {
   uint32_t pre_time;
@@ -41,6 +43,32 @@ void apMain(void)
       ledToggle(_DEF_LED1);
     }
     cmdifMain();
+
+    bleUartUpdate();
+
+#ifdef _USE_HW_BLEUART
+    static int i = 0;
+    static uint32_t diff_time;
+    static uint32_t pre_time_uart;
+
+    pre_time_uart = millis();
+    bleUartPrintf("ble12345678901234567890 %d %d\n", i++, diff_time);
+    diff_time = millis()-pre_time_uart;
+#else
+
+    static uint32_t pre_time_ble;
+
+
+    if (millis()-pre_time_ble >= 100)
+    {
+      pre_time_ble = millis();
+      bleUartPrintf("a");
+    }
+    while (bleUartAvailable() > 0)
+    {
+      uartPutch(_DEF_UART2, bleUartRead());
+    }
+#endif
   }
 }
 

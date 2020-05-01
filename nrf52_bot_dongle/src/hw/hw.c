@@ -64,7 +64,9 @@ void hwInit(void)
   flashInit();
 
   usbInit();
+  delay(100);
 
   // After usbInit()
-  radioInit();
+  //radioInit();
+  bleUartInit();
 }

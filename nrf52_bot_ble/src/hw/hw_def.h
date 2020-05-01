@@ -72,6 +72,6 @@
 
 
 #define _USE_HW_BLEUART
-
+//#define _USE_HW_BLEUART_C
 
 #endif /* SRC_HW_HW_DEF_H_ */

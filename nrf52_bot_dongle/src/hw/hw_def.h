@@ -54,6 +54,7 @@
 #define      HW_RADIO_BASE_ADDR     0x12345678
 #define      HW_RADIO_MAX_BUF_LEN   8
 
-
+#define _USE_HW_BLEUART_C
+//#define _USE_HW_BLEUART
 
 #endif /* SRC_HW_HW_DEF_H_ */
