@@ -57,12 +57,12 @@ void apMain(void)
 #else
 
     static uint32_t pre_time_ble;
-
+    static int i = 0;
 
     if (millis()-pre_time_ble >= 100)
     {
       pre_time_ble = millis();
-      bleUartPrintf("a");
+      bleUartPrintf("ble tx : %d\n", i++);
     }
     while (bleUartAvailable() > 0)
     {

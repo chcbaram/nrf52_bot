@@ -47,13 +47,22 @@ void apMain(void)
     cmdifMain();
 
 #ifdef _USE_HW_BLEUART
-    if (bleUartAvailable() > 0)
+    uint32_t rx_cnt = 0;
+
+    while (bleUartAvailable() > 0)
     {
       uint8_t rx_data;
 
       rx_data = bleUartRead();
-      bleUartPrintf("ble rx 0x%X\n", rx_data);
       uartPutch(_DEF_UART2, rx_data);
+
+      rx_cnt++;
+    }
+
+    static uint32_t cnt = 0;
+    if (rx_cnt > 0)
+    {
+      bleUartPrintf("ble rx %d, %d\n", rx_cnt, cnt++);
     }
 #else
 
