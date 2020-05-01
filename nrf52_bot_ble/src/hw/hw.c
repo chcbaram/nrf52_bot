@@ -36,6 +36,7 @@ __attribute__((section(".tag"))) const flash_tag_t fw_tag =
    };
 
 
+extern void usb_init_temp(void);
 
 void hwInit(void)
 {
@@ -62,6 +63,7 @@ void hwInit(void)
 
   usbInit();
 
+
   lcdInit();  
 
 
@@ -69,6 +71,6 @@ void hwInit(void)
 
 
   // After usbInit()
-//  radioInit();
+  //radioInit();
   bleUartInit();
 }

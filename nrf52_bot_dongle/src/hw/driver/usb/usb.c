@@ -74,16 +74,20 @@ void usb_init(bool cdc_only)
     const nrfx_power_usbevt_config_t config = { .handler = (nrfx_power_usb_event_handler_t) tusb_hal_nrf_power_event };
     nrfx_power_usbevt_init(&config);
 
-    nrfx_power_usbevt_enable();
+    //nrfx_power_usbevt_enable();
 
     usb_reg = NRF_POWER->USBREGSTATUS;
   }
 
-  if ( usb_reg & POWER_USBREGSTATUS_VBUSDETECT_Msk ) {
+  // BLE 활성화시 POWER_CLOCK 인터럽트가 발생하지 않아서, 강제로 USB 있다고 설정함. by Baram
+  //
+  //if ( usb_reg & POWER_USBREGSTATUS_VBUSDETECT_Msk )
+  {
     tusb_hal_nrf_power_event(NRFX_POWER_USB_EVT_DETECTED);
   }
 
-  if ( usb_reg & POWER_USBREGSTATUS_OUTPUTRDY_Msk ) {
+  //if ( usb_reg & POWER_USBREGSTATUS_OUTPUTRDY_Msk )
+  {
     tusb_hal_nrf_power_event(NRFX_POWER_USB_EVT_READY);
   }
 
