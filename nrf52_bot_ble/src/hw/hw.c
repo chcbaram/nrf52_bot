@@ -172,16 +172,16 @@ void hwInit(void)
     for (int i=0; i<32; i++)
     {
       logPrintf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, \n",
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5),
-                (int)(outbuf[index++]*1.5)
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0),
+                (int)(outbuf[index++]*1.0)
                 );
     }
     if (dif_time > max_dec_time) max_dec_time = dif_time;
