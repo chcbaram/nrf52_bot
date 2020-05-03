@@ -22,7 +22,7 @@ void apInit(void)
 {
   hwInit();
 
-  cmdifOpen(_DEF_UART1, 57600);
+  cmdifOpen(_DEF_UART1, 115200);
   cmdifAdd("boot", bootCmdif);
 
   osThreadDef(threadUsb, threadUsb, _HW_DEF_RTOS_THREAD_PRI_USB, 0, _HW_DEF_RTOS_THREAD_MEM_USB);

@@ -39,12 +39,14 @@ __attribute__((section(".tag"))) const flash_tag_t fw_tag =
    };
 
 
+#ifdef OPUS_TEST
+#include "sound/wav.h"
 
 void test_failed()
 {
   while(1);
 }
-
+#endif
 
 void hwInit(void)
 {
@@ -57,8 +59,8 @@ void hwInit(void)
   buttonInit();
   vcpInit();
   uartInit();
-  uartOpen(_DEF_UART1, 57600);
-  uartOpen(_DEF_UART2, 57600);
+  uartOpen(_DEF_UART1, 115200);
+  uartOpen(_DEF_UART2, 115200);
 
   logPrintf("\n\n[ Firmware Begin... ]\r\n");
   logPrintf("Addr Tag   \t\t: 0x%X\r\n", (int)fw_tag.addr_tag);
@@ -95,13 +97,13 @@ void hwInit(void)
   {
   }
 
-  int bitrate = 16000;
+  int bitrate = 16000/2;
 
   if(opus_encoder_ctl(enc, OPUS_SET_BITRATE(bitrate)) != OPUS_OK) test_failed();
   if(opus_encoder_ctl(enc, OPUS_SET_VBR(1)) != OPUS_OK) test_failed();
-  if(opus_encoder_ctl(enc, OPUS_SET_VBR_CONSTRAINT(1)) != OPUS_OK) test_failed();
+  if(opus_encoder_ctl(enc, OPUS_SET_VBR_CONSTRAINT(0)) != OPUS_OK) test_failed();
   if(opus_encoder_ctl(enc, OPUS_SET_EXPERT_FRAME_DURATION(OPUS_FRAMESIZE_20_MS)) != OPUS_OK) test_failed();
-  if(opus_encoder_ctl(enc, OPUS_SET_COMPLEXITY(7)) != OPUS_OK) test_failed();
+  if(opus_encoder_ctl(enc, OPUS_SET_COMPLEXITY(0)) != OPUS_OK) test_failed();
 
   opus_int16 inbuf[640];
   opus_int16 outbuf[640];
@@ -109,6 +111,7 @@ void hwInit(void)
   int len;
   int out_samples;
 
+#if 0
   for (int i=0; i<640; i++)
   {
     //inbuf[i] = rand()%0xFFFF;
@@ -135,6 +138,61 @@ void hwInit(void)
   {
     logPrintf("%d %d %d\n", i, inbuf[i], outbuf[i]);
   }
+#else
+  uint32_t max_enc_time = 0;
+  uint32_t max_dec_time = 0;
+  uint32_t max_enc_len = 0;
+  uint32_t max_enc_size = 0;
+  uint32_t max_dec_size = 0;
+  int index = 0;
+
+  logPrintf("\n\n");
+  logPrintf("int16_t wav_data[%d] = \n", (NUM_ELEMENTS/320)*320);
+  logPrintf("{\n");
+
+  for (int j=0; j<NUM_ELEMENTS/320; j++)
+  {
+    uint32_t dif_time;
+    uint32_t pre_time = micros();
+    len = opus_encode(enc, (const opus_int16 *)&wav_data[j*320], 320, packet, 15000);
+    dif_time = micros()-pre_time;
+
+    if (dif_time > max_enc_time) max_enc_time = dif_time;
+    if (len > max_enc_len) max_enc_len = len;
+
+    max_enc_size += len;
+
+    pre_time = micros();
+    out_samples = opus_decode(dec, packet, len, outbuf, 320, 0);
+    dif_time = micros()-pre_time;
+    max_dec_size += out_samples;
+
+
+    index = 0;
+    for (int i=0; i<32; i++)
+    {
+      logPrintf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, \n",
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5),
+                (int)(outbuf[index++]*1.5)
+                );
+    }
+    if (dif_time > max_dec_time) max_dec_time = dif_time;
+  }
+  logPrintf("max size : %d\n", (NUM_ELEMENTS/320) * 320);
+  logPrintf("max enc time : %d.%d ms\n", max_enc_time/1000, (max_enc_time/100)%10);
+  logPrintf("max dec time : %d.%d ms\n", max_dec_time/1000, (max_dec_time/100)%10);
+  logPrintf("max enc len  : %d \n", max_enc_len);
+  logPrintf("max enc size : %d \n", max_enc_size);
+  logPrintf("max dec size : %d \n", max_dec_size);
+#endif
 #endif
 
 
