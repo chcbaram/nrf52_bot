@@ -57,6 +57,12 @@
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std.835120093" name="Language standard" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std" useByScannerDiscovery="true" value="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std.gnu11" valueType="enumerated"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths.1328896907" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths" useByScannerDiscovery="true" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/silk/fixed}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/silk/float}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/silk}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/celt}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/ble_sdk}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/ble_sdk/port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/bsp/FreeRTOS/Source/CMSIS_RTOS}&quot;"/>
@@ -82,6 +88,10 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs.1271815604" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs" useByScannerDiscovery="true" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="NRF52840_XXAA"/>
+									<listOptionValue builtIn="false" value="FIXED_POINT"/>
+									<listOptionValue builtIn="false" value="VAR_ARRAYS"/>
+									<listOptionValue builtIn="false" value="OPUS_BUILD"/>
+									<listOptionValue builtIn="false" value="CUSTOM_MODES"/>
 									<listOptionValue builtIn="false" value="S140"/>
 									<listOptionValue builtIn="false" value="SOFTDEVICE_PRESENT"/>
 									<listOptionValue builtIn="false" value="USE_LFRC"/>
@@ -94,6 +104,11 @@
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.noexceptions.383299741" name="Do not use exceptions (-fno-exceptions)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.noexceptions" useByScannerDiscovery="true" value="true" valueType="boolean"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths.46235566" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths" useByScannerDiscovery="true" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/silk/float}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/silk}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/celt}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/lib/opus/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/bsp/FreeRTOS/Source/CMSIS_RTOS}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/bsp/FreeRTOS/Source/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/bsp/FreeRTOS}&quot;"/>
@@ -117,6 +132,9 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs.301556440" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs" useByScannerDiscovery="true" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="NRF52840_XXAA"/>
+									<listOptionValue builtIn="false" value="VAR_ARRAYS"/>
+									<listOptionValue builtIn="false" value="CUSTOM_MODES"/>
+									<listOptionValue builtIn="false" value="OPUS_BUILD"/>
 									<listOptionValue builtIn="false" value="S140"/>
 									<listOptionValue builtIn="false" value="USE_LFRC"/>
 									<listOptionValue builtIn="false" value="USE_TINYUSB"/>
@@ -159,8 +177,58 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1516018803.1959696076" name="/" resourcePath="src/lib/opus">
+						<toolChain id="ilg.gnuarmeclipse.managedbuild.cross.toolchain.elf.debug.1321132514" name="ARM Cross GCC" superClass="ilg.gnuarmeclipse.managedbuild.cross.toolchain.elf.debug" unusedChildren="">
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createflash.118228707.1037273695" name="Create flash image" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createflash.118228707"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting.1239990068.41714396" name="Create extended listing" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting.1239990068"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.printsize.1427627397.1333168949" name="Print size" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.printsize.1427627397"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.404548339.604452469" name="Optimization Level" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.404548339"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.messagelength.905679162.2101516177" name="Message length (-fmessage-length=0)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.messagelength.905679162"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.signedchar.691087926.1577162548" name="'char' is signed (-fsigned-char)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.signedchar.691087926"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections.910475500.1022457135" name="Function sections (-ffunction-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections.910475500"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections.564540466.574427288" name="Data sections (-fdata-sections)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections.564540466"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level.961087221.567203375" name="Debug level" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level.961087221"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.format.20956979.925447707" name="Debug format" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.format.20956979"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name.2119194115.976359475" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name.2119194115"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.architecture.1546024349.314242024" name="Architecture" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.architecture.1546024349"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.family.1069680494.1829906941" name="ARM family (-mcpu)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.family.1069680494"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.instructionset.143581898.1950685876" name="Instruction set" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.instructionset.143581898"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix.567716780.764443139" name="Prefix" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix.567716780"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.c.673745460.847483595" name="C compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.c.673745460"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.cpp.654859862.1120549186" name="C++ compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.cpp.654859862"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.ar.358757866.892240428" name="Archiver" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.ar.358757866"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.objcopy.1992379625.187605768" name="Hex/Bin converter" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.objcopy.1992379625"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.objdump.1329188746.1428159041" name="Listing generator" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.objdump.1329188746"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.size.2081015519.30377616" name="Size command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.size.2081015519"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.make.1644544019.1670045986" name="Build command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.make.1644544019"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.rm.877205355.2134147096" name="Remove command" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.rm.877205355"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.fpu.unit.291369249.780467954" name="FPU Type" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.fpu.unit.291369249"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.spconstant.228687955.1927445336" name="Single precision constants (-fsingle-precision-constant)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.spconstant.228687955"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.allwarn.1944937069.1769646190" name="Enable all common warnings (-Wall)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.allwarn.1944937069"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.extrawarn.1432892994.1624303283" name="Enable extra warnings (-Wextra)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.extrawarn.1432892994"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.id.1029392949.1063729604" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.id.1029392949"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.fpu.abi.1781619920.1138536944" name="Float ABI" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.arm.target.fpu.abi.1781619920"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform" isAbstract="false" osList="all" superClass="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.452646475" name="GNU ARM Cross Assembler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.1763832136">
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input.1653978083" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.979764627" name="GNU ARM Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1449932397">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otheroptimizations.101322054" name="Other optimization flags" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otheroptimizations" useByScannerDiscovery="true" value="-O1" valueType="string"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.141787894" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.586305429" name="GNU ARM Cross C++ Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.871416032">
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.2109116235" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input"/>
+							</tool>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker.126311265" name="GNU ARM Cross C Linker" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.linker.1043146061"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker.885207108" name="GNU ARM Cross C++ Linker" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.linker.1201483560"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver.1846634640" name="GNU ARM Cross Archiver" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver.534116877"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.createflash.217500847" name="GNU ARM Cross Create Flash Image" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.createflash.136279354"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.createlisting.2107976303" name="GNU ARM Cross Create Listing" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.createlisting.1739162595"/>
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize.482335628" name="GNU ARM Cross Print Size" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize.76940724"/>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/ap/nrf_sdk/nrfsdk.c|src/bsp/FreeRTOS/Source/portable/MemMang/heap_1.c|src/lib/ble_bluefruit/services/BLEBas.cpp|src/bsp/FreeRTOS/Source/portable/MemMang/heap_5.c|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM4F|src/bsp/FreeRTOS/Source/CMSIS_RTOS_V2|src/lib/ble_bluefruit/services/BLEMidi.cpp|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM0|src/bsp/FreeRTOS/Source/portable/MemMang/heap_4.c|src/bsp/FreeRTOS/Source/portable/IAR|src/bsp/FreeRTOS/Source/portable/Common|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM23_NTZ|src/lib/ble_bluefruit/services/BLEBeacon.cpp|src/lib/ble_bluefruit/services/BLEDfu.cpp|src/lib/ble_bluefruit/services/BLEUart.cpp|src/lib/ble_bluefruit/clients|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM7_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM7|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM3|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM33|src/lib/ble_bluefruit/services/BLEHidAdafruit.cpp|src/lib/ble_bluefruit/services/BLEHidGeneric.cpp|src/bsp/FreeRTOS/Source/portable/Keil|src/lib/ble_bluefruit/services/EddyStone.cpp|src/bsp/FreeRTOS/Source/portable/MemMang/heap_2.c|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM23|src/bsp/FreeRTOS/Source/portable/Tasking|src/bsp/FreeRTOS/Source/portable/RVDS" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/lib/opus/silk/float|src/ap/nrf_sdk/nrfsdk.c|src/bsp/FreeRTOS/Source/portable/MemMang/heap_1.c|src/lib/ble_bluefruit/services/BLEBas.cpp|src/bsp/FreeRTOS/Source/portable/MemMang/heap_5.c|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM4F|src/bsp/FreeRTOS/Source/CMSIS_RTOS_V2|src/lib/ble_bluefruit/services/BLEMidi.cpp|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM0|src/bsp/FreeRTOS/Source/portable/MemMang/heap_4.c|src/bsp/FreeRTOS/Source/portable/IAR|src/bsp/FreeRTOS/Source/portable/Common|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM23_NTZ|src/lib/ble_bluefruit/services/BLEBeacon.cpp|src/lib/ble_bluefruit/services/BLEDfu.cpp|src/lib/ble_bluefruit/services/BLEUart.cpp|src/lib/ble_bluefruit/clients|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM7_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM7|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM3|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM33|src/lib/ble_bluefruit/services/BLEHidAdafruit.cpp|src/lib/ble_bluefruit/services/BLEHidGeneric.cpp|src/bsp/FreeRTOS/Source/portable/Keil|src/lib/ble_bluefruit/services/EddyStone.cpp|src/bsp/FreeRTOS/Source/portable/MemMang/heap_2.c|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM23|src/bsp/FreeRTOS/Source/portable/Tasking|src/bsp/FreeRTOS/Source/portable/RVDS" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -243,7 +311,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/ap/nrf_sdk/nrfsdk.c|src/bsp/FreeRTOS/Source/portable/MemMang/heap_1.c|src/lib/ble_bluefruit/services/BLEBas.cpp|src/bsp/FreeRTOS/Source/portable/MemMang/heap_5.c|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM4F|src/bsp/FreeRTOS/Source/CMSIS_RTOS_V2|src/lib/ble_bluefruit/services/BLEMidi.cpp|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM0|src/bsp/FreeRTOS/Source/portable/MemMang/heap_4.c|src/bsp/FreeRTOS/Source/portable/IAR|src/bsp/FreeRTOS/Source/portable/Common|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM23_NTZ|src/lib/ble_bluefruit/services/BLEBeacon.cpp|src/lib/ble_bluefruit/services/BLEDfu.cpp|src/lib/ble_bluefruit/services/BLEUart.cpp|src/lib/ble_bluefruit/clients|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM7_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM7|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM3|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM33|src/lib/ble_bluefruit/services/BLEHidAdafruit.cpp|src/lib/ble_bluefruit/services/BLEHidGeneric.cpp|src/bsp/FreeRTOS/Source/portable/Keil|src/lib/ble_bluefruit/services/EddyStone.cpp|src/bsp/FreeRTOS/Source/portable/MemMang/heap_2.c|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM23|src/bsp/FreeRTOS/Source/portable/Tasking|src/bsp/FreeRTOS/Source/portable/RVDS" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/lib/opus/silk/float|src/ap/nrf_sdk/nrfsdk.c|src/bsp/FreeRTOS/Source/portable/MemMang/heap_1.c|src/lib/ble_bluefruit/services/BLEBas.cpp|src/bsp/FreeRTOS/Source/portable/MemMang/heap_5.c|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM4F|src/bsp/FreeRTOS/Source/CMSIS_RTOS_V2|src/lib/ble_bluefruit/services/BLEMidi.cpp|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM0|src/bsp/FreeRTOS/Source/portable/MemMang/heap_4.c|src/bsp/FreeRTOS/Source/portable/IAR|src/bsp/FreeRTOS/Source/portable/Common|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM33_NTZ|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM23_NTZ|src/lib/ble_bluefruit/services/BLEBeacon.cpp|src/lib/ble_bluefruit/services/BLEDfu.cpp|src/lib/ble_bluefruit/services/BLEUart.cpp|src/lib/ble_bluefruit/clients|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM7_MPU|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM7|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM3|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM33|src/lib/ble_bluefruit/services/BLEHidAdafruit.cpp|src/lib/ble_bluefruit/services/BLEHidGeneric.cpp|src/bsp/FreeRTOS/Source/portable/Keil|src/lib/ble_bluefruit/services/EddyStone.cpp|src/bsp/FreeRTOS/Source/portable/MemMang/heap_2.c|src/bsp/FreeRTOS/Source/portable/GCC/ARM_CM23|src/bsp/FreeRTOS/Source/portable/Tasking|src/bsp/FreeRTOS/Source/portable/RVDS" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

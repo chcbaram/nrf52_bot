@@ -10,6 +10,6 @@
 
 
 #include "ap.h"
-
+#include "opus_main.h"
 
 #endif /* SRC_MAIN_H_ */

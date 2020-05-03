@@ -36,6 +36,15 @@ SECTIONS
   } >FLASH
   
   
+  . = ALIGN(4);
+  .opus_codec :
+  {        
+    *opus* (.data .data* COMMON)      
+    *opus* (.text .text* COMMON)
+    . = ALIGN(4);          
+  } >FLASH
+  
+  
   /* The program code and other data goes into FLASH */
   .text :
   {
@@ -139,7 +148,7 @@ SECTIONS
     _edata = .;        /* define a global symbol at data end */
   } >RAM AT> FLASH
 
-
+  
   
   /* Uninitialized data section */
   . = ALIGN(4);
