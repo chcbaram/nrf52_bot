@@ -12,7 +12,7 @@
 #include "util.h"
 #include <unistd.h>
 #include "wav.h"
-
+#include "opus.h"
 
 #define FLASH_TAG_SIZE      0x400
 
@@ -26,6 +26,8 @@ flash_tag_t    fw_tag;
 int32_t getFileSize(char *file_name);
 bool addTagToBin(char *src_filename, char *dst_filename);
 bool makeWav(void);
+bool makeWavToOpus(char *file_name);
+
 
 void apInit(void)
 {
@@ -35,312 +37,29 @@ void apInit(void)
 void apMain(int argc, char *argv[])
 {
   bool ret;
-  char *port_name;
   char *file_name;
-  char *file_type;
-  int baud;
-  int file_size;
-  uint8_t  block_buf[FLASH_TX_BLOCK_LENGTH];
-  uint8_t  version_str[128];
-  uint8_t  board_str[128];
-  static FILE *fp;
-  uint8_t errcode;
-  uint32_t time_pre;
-  bool flash_write_done;
-  uint32_t addr;
-  size_t readbytes;
-  uint32_t percent;
-  uint32_t len;
-  uint32_t pre_percent = 100;
-  uint32_t start_addr = 0;
-  uint32_t file_run = 0;
 
-  uint32_t flash_begin;
-  uint32_t flash_end;
+
   char dst_filename[256];
-  int slot_number;
 
 
   setbuf(stdout, NULL);
 
 
-  makeWav();
-
-  if (argc != 7)
+  if (argc == 2)
   {
-    printf("fw_loader.exe com1 115200 type[fw:image] 0x9000000 file_name run[0:1]\n");
+    file_name = (char *)argv[ 1 ];
+
+    printf("makeWavToOpus : %s\n", file_name);
+    makeWavToOpus(file_name);
     return;
   }
 
-  printf("fw_loader... V200228R1\n\n");
-
-  port_name = (char *)argv[ 1 ];
-  baud      = strtol( argv[ 2 ], NULL, 10 );
-  file_type = (char *)argv[ 3 ];
-  start_addr= (uint32_t)strtoul( argv[ 4 ], NULL, 0 );
-  file_name = (char *)argv[ 5 ];
-  file_run  = (uint32_t)strtol( argv[ 6 ], NULL, 0 );
-
-  if (start_addr <= 15)
-  {
-    slot_number = start_addr;
-    start_addr = 0x90000000 + 0x200000 * slot_number;
-
-    printf("slot number : %d\n", slot_number);
-    printf("     addr   : 0x%X\n", start_addr);
-  }
-
-  if(strcmp(file_type, "fw") == 0)
-  {
-    printf("\r\n@ Make binary (Add Tag)...\r\n");
-    strcpy(dst_filename, file_name);
-    strcat(dst_filename, ".fw");
-
-    if(addTagToBin(file_name, dst_filename) != true)
-    {
-      fprintf( stderr, "  Add tag info to binary Fail! \n");
-      exit( 1 );
-    }
-
-    file_size = getFileSize(dst_filename);
-
-
-    printf("\nfirmware downloader...\n\n");
-
-    printf("file open\n");
-    printf("  file name \t: %s \n", file_name);
-    printf("  file size \t: %d B\n", file_size);
-    printf("  file addr \t: 0x%X\n", fw_tag.addr_fw);
-    printf("  file board\t: %s\n", (char *)fw_tag.board_str);
-    printf("  file name \t: %s\n", (char *)fw_tag.name_str);
-    printf("  file ver  \t: %s\n", (char *)fw_tag.version_str);
-
-    printf("  file magic\t: 0x%X\n", fw_tag.magic_number);
-
-
-    if (fw_tag.magic_number != 0x5555AAAA)
-    {
-      printf("MagicNumber Fail, Wrong Image.\n");
-      return;
-    }
-  }
-  else
-  {
-    strcpy(dst_filename, file_name);
-
-    file_size = getFileSize(dst_filename);
-
-
-    printf("\nimage downloader...\n\n");
-
-    printf("file open\n");
-    printf("  file name \t: %s \n", file_name);
-    printf("  file size \t: %d B\n", file_size);
-    printf("  file addr \t: 0x%X\n", start_addr);
-  }
-
-
-
-  printf("port open \t: %s\n", port_name);
-  printf("     baud \t: %d\n", baud);
-
-  ret = bootInit(_DEF_UART2, port_name, baud);
-  if (ret != true)
-  {
-    if (bootInit(_DEF_UART2, port_name, baud) != true)
-    {
-      printf("bootInit  Fail\n");
-      return;
-    }
-  }
-
-  printf("bootInit \t: OK\n");
-
-
-  flash_begin = start_addr;
-  flash_end   = start_addr + file_size;
-
-
-  while(1)
-  {
-    //-- 보드 이름 확인
-    //
-    errcode = bootCmdReadBootName(board_str);
-    if (errcode == OK)
-    {
-      printf("boot name \t: %s\n", board_str);
-    }
-    else
-    {
-      printf("bootCmdReadBoardName faild \n");
-      break;
-    }
-
-
-    //-- 버전 확인
-    //
-    errcode = bootCmdReadBootVersion(version_str);
-    if (errcode == OK)
-    {
-      printf("boot version \t: %s\n", &version_str[0]);
-    }
-    else
-    {
-      printf("bootCmdReadBootVersion faild \n");
-      break;
-    }
-
-    errcode = bootCmdReadFirmVersion(version_str);
-    if (errcode == OK)
-    {
-      printf("firm version \t: %s\n", &version_str[0]);
-    }
-    else
-    {
-      printf("bootCmdReadFirmVersion faild \n");
-      break;
-    }
-
-    /*
-    if (strcmp((const char *)board_str, (const char *)info.board_str) != 0)
-    {
-      printf("board name is not equal. \n");
-      break;
-    }
-    */
-
-    //-- Flash Erase
-    //
-    printf("erase fw...\n");
-    time_pre = millis();
-    errcode = bootCmdFlashErase(flash_begin, flash_end - flash_begin);
-    if (errcode == OK)
-    {
-      printf("erase fw ret \t: OK (%d ms)\n", millis()-time_pre);
-    }
-    else
-    {
-      printf("bootCmdFlashEraseFw faild : %d\n", errcode);
-      break;
-    }
-
-
-    //-- Flash Write
-    //
-    if( ( fp = fopen( dst_filename, "rb" ) ) == NULL )
-    {
-      fprintf( stderr, "Unable to open %s\n", file_name );
-      exit(1);
-    }
-
-
-    flash_write_done = false;
-    addr = flash_begin;
-    time_pre = millis();
-    while(1)
-    {
-      if( !feof( fp ) )
-      {
-        readbytes = fread( block_buf, 1, FLASH_TX_BLOCK_LENGTH, fp );
-        percent = (addr+readbytes-flash_begin)*100/file_size;
-
-        if ((percent%10) == 0 && percent != pre_percent)
-        {
-          if (percent == 0)
-          {
-            printf("flash fw \t: %d%% ", percent);
-          }
-          else
-          {
-            printf("%d%% ", percent);
-          }
-          pre_percent = percent;
-        }
-      }
-      else
-      {
-        break;
-      }
-
-      if( readbytes == 0 )
-      {
-        break;
-      }
-      else
-      {
-        len = readbytes;
-      }
-
-
-      for (int retry=0; retry<3; retry++)
-      {
-        errcode = bootCmdFlashWrite(addr, block_buf, len);
-        if( errcode == OK )
-        {
-          break;
-        }
-        else
-        {
-          printf("bootCmdFlashWrite Fail \t: %d \n", errcode);
-        }
-      }
-      if( errcode != OK )
-      {
-        break;
-      }
-
-      addr += len;
-
-      if ((addr-flash_begin) == file_size)
-      {
-        flash_write_done = true;
-        break;
-      }
-    }
-    fclose(fp);
-
-    printf("\r\n");
-
-    if( errcode != OK || flash_write_done == false )
-    {
-      printf("flash fw fail \t: %d\n", errcode);
-      break;
-    }
-    else
-    {
-      printf("flash fw ret \t: OK (%d ms) \n", millis()-time_pre);
-    }
-
-
-    if( errcode != OK || flash_write_done == false )
-    {
-      printf("Download \t: Fail\n");
-      return;
-    }
-    else
-    {
-      printf("Download \t: OK\n");
-    }
-
-    if (file_run > 0)
-    {
-      errcode = bootCmdJumpToFw();
-      if (errcode == OK)
-      {
-          printf("jump to fw \t: OK\n");
-      }
-      else
-      {
-        printf("jump to fw fail : %d\n", errcode);
-      }
-    }
-
-    break;
-  }
-
-
-  uartClose(_DEF_UART2);
+  makeWav();
 }
+
+
+
 
 int32_t getFileSize(char *file_name)
 {
@@ -509,7 +228,7 @@ typedef struct wavfile_header_s
 #define SUBCHUNK1SIZE   (16)
 #define AUDIO_FORMAT    (1) /*For PCM*/
 #define NUM_CHANNELS    (1)
-#define SAMPLE_RATE     (16000)
+#define SAMPLE_RATE     (16000/1)
 #define BIT_RATE        16
 
 
@@ -562,6 +281,183 @@ bool makeWav(void)
 
 
   fclose(p_fd);
+
+  return true;
+}
+
+
+
+static int err;
+static int sampling_rate = 16000;
+static int bitrate       = 16000;
+static int num_channels  = 1;
+static int application   = OPUS_APPLICATION_VOIP;
+
+static OpusEncoder *enc;
+static OpusDecoder *dec;
+
+static opus_int16 outbuf[320];
+static uint8_t    packet[1024+257];
+
+
+static bool codecOpusInit()
+{
+  enc = opus_encoder_create(sampling_rate, num_channels, application, &err);
+  if(err != OPUS_OK || enc==NULL)
+  {
+    return false;
+  }
+
+  if(opus_encoder_ctl(enc, OPUS_SET_BITRATE(bitrate)) != OPUS_OK) return false;
+  if(opus_encoder_ctl(enc, OPUS_SET_VBR(0)) != OPUS_OK) return false;
+  if(opus_encoder_ctl(enc, OPUS_SET_VBR_CONSTRAINT(0)) != OPUS_OK) return false;
+  if(opus_encoder_ctl(enc, OPUS_SET_EXPERT_FRAME_DURATION(OPUS_FRAMESIZE_20_MS)) != OPUS_OK) return false;
+  if(opus_encoder_ctl(enc, OPUS_SET_COMPLEXITY(10)) != OPUS_OK) return false;
+
+  return true;
+}
+
+
+
+typedef struct
+{
+  uint32_t magic_number;        // 4
+  uint32_t file_type;           // 4
+  uint16_t frame_len;           // 2
+  uint16_t enc_len;             // 2
+  uint32_t file_len;            // 4
+  uint32_t reserved[4];
+} opus_tag_t;
+
+
+bool makeWavToOpus(char *file_name)
+{
+  int src_len;
+  wavfile_header_t header;
+  FILE    *fp_wav;
+  FILE    *fp_opus;
+
+
+
+
+  codecOpusInit();
+
+
+  if ((fp_wav = fopen(file_name, "rb")) == NULL)
+  {
+    fprintf( stderr, "  unable to open src file(%s)\n", file_name );
+    exit( 1 );
+  }
+
+  fseek( fp_wav, 0, SEEK_END );
+  src_len = ftell( fp_wav );
+  fseek( fp_wav, 0, SEEK_SET );
+
+  /* Copy read fp to buf */
+  if(fread( &header, 1, sizeof(wavfile_header_t), fp_wav ) != sizeof(wavfile_header_t))
+  {
+    fclose(fp_wav);
+    fprintf( stderr, "  length is wrong! \n" );
+    exit( 1 );
+  }
+
+  header.AudioFormat = AUDIO_FORMAT;
+  header.NumChannels = NUM_CHANNELS;
+  header.SampleRate = SAMPLE_RATE;
+  header.ByteRate = SAMPLE_RATE * NUM_CHANNELS * BIT_RATE / 8;
+  header.BlockAlign = NUM_CHANNELS * BIT_RATE / 8;
+  header.BitsPerSample = BIT_RATE;
+
+  printf("AudioFormat   %d\n", header.AudioFormat);
+  printf("NumChannels   %d\n", header.NumChannels);
+  printf("SampleRate    %d\n", header.SampleRate);
+  printf("ByteRate      %d\n", header.ByteRate);
+  printf("BlockAlign    %d\n", header.BlockAlign);
+  printf("BitsPerSample %d\n", header.BitsPerSample);
+
+  printf("DataSize      %d\n", header.Subchunk2Size);
+
+
+  char opus_file_name[128];
+
+  sprintf(opus_file_name, "%s.opus", file_name);
+
+
+  if ((fp_opus = fopen(opus_file_name, "wb")) == NULL)
+  {
+    fclose(fp_opus);
+    fprintf( stderr, "  unable to open src file(%s)\n", fp_opus );
+    exit( 1 );
+  }
+
+  uint32_t max_file_len = 0;
+  uint32_t max_enc_len = 0;
+  uint32_t max_enc_size = 0;
+
+
+  uint8_t *opus_file_buf;
+  uint32_t opus_file_len = 0;
+  opus_tag_t *p_opus_tag;
+
+
+
+  opus_file_buf = (uint8_t *)malloc(src_len);
+  if (opus_file_buf == NULL)
+  {
+    fclose(fp_opus);
+    fclose(fp_wav);
+    return false;
+  }
+
+  p_opus_tag = (opus_tag_t *)opus_file_buf;
+
+  p_opus_tag->magic_number = 0x5555AAAA;
+  p_opus_tag->frame_len = 320;
+  p_opus_tag->file_len = 0;
+  while(1)
+  {
+    int wav_len;
+    int enc_len;
+    int frame_len = 320;
+    int16_t wav_buf[frame_len];
+
+    wav_len = fread( wav_buf, 1, frame_len*2, fp_wav );
+
+    if (wav_len < frame_len*2)
+    {
+      break;
+    }
+    enc_len = opus_encode(enc, (const opus_int16 *)wav_buf, frame_len, packet, 1024);
+
+
+    for (int i=0; i<enc_len; i++)
+    {
+      opus_file_buf[sizeof(opus_tag_t) + max_enc_size + i] = packet[i];
+    }
+
+    if (enc_len > max_enc_len) max_enc_len = enc_len;
+
+    max_enc_size += enc_len;
+    max_file_len += wav_len;
+  }
+
+  printf("max size     : %d \n", max_file_len);
+  printf("max enc len  : %d \n", max_enc_len);
+  printf("max enc size : %d \n", max_enc_size);
+
+
+  p_opus_tag->file_len = max_enc_size;
+  p_opus_tag->enc_len = max_enc_len;
+
+
+  fwrite(opus_file_buf, 1, sizeof(opus_tag_t) + max_enc_size, fp_opus);
+
+
+
+  free(opus_file_buf);
+  fclose(fp_opus);
+  fclose(fp_wav);
+
 
   return true;
 }
