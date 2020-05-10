@@ -37,9 +37,9 @@ extern "C"
 #endif
 
 /* Max number of encoder channels (1/2) */
-#define ENCODER_NUM_CHANNELS                    1
+#define ENCODER_NUM_CHANNELS                    2
 /* Number of decoder channels (1/2) */
-#define DECODER_NUM_CHANNELS                    1
+#define DECODER_NUM_CHANNELS                    2
 
 #define MAX_FRAMES_PER_PACKET                   3
 

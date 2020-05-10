@@ -46,6 +46,7 @@ void apMain(int argc, char *argv[])
   setbuf(stdout, NULL);
 
 
+
   if (argc == 2)
   {
     file_name = (char *)argv[ 1 ];
@@ -296,7 +297,7 @@ static int application   = OPUS_APPLICATION_VOIP;
 static OpusEncoder *enc;
 static OpusDecoder *dec;
 
-static opus_int16 outbuf[320];
+static opus_int16 outbuf[640];
 static uint8_t    packet[1024+257];
 
 
@@ -307,12 +308,27 @@ static bool codecOpusInit()
   {
     return false;
   }
+  printf("opus_encoder_create OK, %d\n", err);
 
-  if(opus_encoder_ctl(enc, OPUS_SET_BITRATE(bitrate)) != OPUS_OK) return false;
-  if(opus_encoder_ctl(enc, OPUS_SET_VBR(0)) != OPUS_OK) return false;
+  dec = opus_decoder_create(sampling_rate, num_channels, &err);
+  if(err != OPUS_OK || enc==NULL)
+  {
+    return false;
+  }
+  printf("opus_decoder_create OK, %d\n", err);
+
+
+  //if(opus_encoder_ctl(enc, OPUS_SET_BITRATE(OPUS_AUTO)) != OPUS_OK) return false;
+  if(opus_encoder_ctl(enc, OPUS_SET_BITRATE(sampling_rate)) != OPUS_OK) return false;
+  if(opus_encoder_ctl(enc, OPUS_SET_VBR(1)) != OPUS_OK) return false;
   if(opus_encoder_ctl(enc, OPUS_SET_VBR_CONSTRAINT(0)) != OPUS_OK) return false;
   if(opus_encoder_ctl(enc, OPUS_SET_EXPERT_FRAME_DURATION(OPUS_FRAMESIZE_20_MS)) != OPUS_OK) return false;
-  if(opus_encoder_ctl(enc, OPUS_SET_COMPLEXITY(10)) != OPUS_OK) return false;
+  if(opus_encoder_ctl(enc, OPUS_SET_COMPLEXITY(0)) != OPUS_OK) return false;
+
+  if(opus_decoder_ctl(dec, OPUS_SET_GAIN(3000)) != OPUS_OK) return false;
+
+
+
 
   return true;
 }
@@ -336,8 +352,7 @@ bool makeWavToOpus(char *file_name)
   wavfile_header_t header;
   FILE    *fp_wav;
   FILE    *fp_opus;
-
-
+  FILE    *fp_wavout;
 
 
   codecOpusInit();
@@ -361,6 +376,7 @@ bool makeWavToOpus(char *file_name)
     exit( 1 );
   }
 
+
   header.AudioFormat = AUDIO_FORMAT;
   header.NumChannels = NUM_CHANNELS;
   header.SampleRate = SAMPLE_RATE;
@@ -377,22 +393,37 @@ bool makeWavToOpus(char *file_name)
 
   printf("DataSize      %d\n", header.Subchunk2Size);
 
+  printf("HeaderSize    %d\n", sizeof(header));
 
   char opus_file_name[128];
+  char wavout_file_name[128];
+
 
   sprintf(opus_file_name, "%s.opus", file_name);
+  sprintf(wavout_file_name, "%s.out.wav", file_name);
 
 
   if ((fp_opus = fopen(opus_file_name, "wb")) == NULL)
   {
     fclose(fp_opus);
-    fprintf( stderr, "  unable to open src file(%s)\n", fp_opus );
+    fprintf( stderr, "  unable to open src file(%s)\n", opus_file_name );
     exit( 1 );
   }
+
+  if ((fp_wavout = fopen(wavout_file_name, "wb")) == NULL)
+  {
+    fclose(fp_wavout);
+    fprintf( stderr, "  unable to open src file(%s)\n", wavout_file_name );
+    exit( 1 );
+  }
+  fseek( fp_wavout, sizeof(wavfile_header_t), SEEK_SET );
+
 
   uint32_t max_file_len = 0;
   uint32_t max_enc_len = 0;
   uint32_t max_enc_size = 0;
+  uint32_t max_dec_size = 0;
+  uint32_t max_pkt_size = 0;
 
 
   uint8_t *opus_file_buf;
@@ -418,6 +449,7 @@ bool makeWavToOpus(char *file_name)
   {
     int wav_len;
     int enc_len;
+    int dec_len;
     int frame_len = 320;
     int16_t wav_buf[frame_len];
 
@@ -437,26 +469,62 @@ bool makeWavToOpus(char *file_name)
 
     if (enc_len > max_enc_len) max_enc_len = enc_len;
 
+
+    dec_len = opus_decode(dec, packet, enc_len, outbuf, frame_len, 0);
+
+    if (max_pkt_size >= 2)
+    {
+      fwrite(outbuf, 1, dec_len*2, fp_wavout);
+    }
+    else
+    {
+      memset(outbuf, 0x00, 320*2);
+      fwrite(outbuf, 1, dec_len*2, fp_wavout);
+    }
+
     max_enc_size += enc_len;
     max_file_len += wav_len;
+    max_dec_size += dec_len*2;
+
+    max_pkt_size += 1;
   }
 
   printf("max size     : %d \n", max_file_len);
   printf("max enc len  : %d \n", max_enc_len);
-  printf("max enc size : %d \n", max_enc_size);
+  printf("max enc size : %d , %d\n", max_enc_size, max_enc_size+max_pkt_size);
+  printf("max dec size : %d \n", max_dec_size);
 
 
   p_opus_tag->file_len = max_enc_size;
   p_opus_tag->enc_len = max_enc_len;
 
 
+  fseek( fp_wavout, 0, SEEK_SET );
+
+  memcpy(header.ChunkID, "RIFF", 4);
+  memcpy(header.Format, "WAVE", 4);
+  memcpy(header.Subchunk1ID, "fmt ", 4);
+  header.Subchunk1Size = 0x10;
+  header.AudioFormat = AUDIO_FORMAT;
+  header.NumChannels = NUM_CHANNELS;
+  header.SampleRate = SAMPLE_RATE;
+  header.ByteRate = SAMPLE_RATE * NUM_CHANNELS * BIT_RATE / 8;
+  header.BlockAlign = NUM_CHANNELS * BIT_RATE / 8;
+  header.BitsPerSample = BIT_RATE;
+  memcpy(header.Subchunk2ID, "data", 4);
+
+
+  header.ChunkSize = max_file_len  + 36;
+  header.Subchunk2Size = max_file_len;
+  fwrite(&header, 1, sizeof(header), fp_wavout);
+
+
   fwrite(opus_file_buf, 1, sizeof(opus_tag_t) + max_enc_size, fp_opus);
-
-
-
   free(opus_file_buf);
+
   fclose(fp_opus);
   fclose(fp_wav);
+  fclose(fp_wavout);
 
 
   return true;
