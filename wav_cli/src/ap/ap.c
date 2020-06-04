@@ -323,9 +323,9 @@ static bool codecOpusInit()
   if(opus_encoder_ctl(enc, OPUS_SET_VBR(1)) != OPUS_OK) return false;
   if(opus_encoder_ctl(enc, OPUS_SET_VBR_CONSTRAINT(0)) != OPUS_OK) return false;
   if(opus_encoder_ctl(enc, OPUS_SET_EXPERT_FRAME_DURATION(OPUS_FRAMESIZE_20_MS)) != OPUS_OK) return false;
-  if(opus_encoder_ctl(enc, OPUS_SET_COMPLEXITY(0)) != OPUS_OK) return false;
+  if(opus_encoder_ctl(enc, OPUS_SET_COMPLEXITY(10)) != OPUS_OK) return false;
 
-  if(opus_decoder_ctl(dec, OPUS_SET_GAIN(3000)) != OPUS_OK) return false;
+  //if(opus_decoder_ctl(dec, OPUS_SET_GAIN(1000)) != OPUS_OK) return false;
 
 
 
@@ -338,10 +338,11 @@ static bool codecOpusInit()
 typedef struct
 {
   uint32_t magic_number;        // 4
-  uint32_t file_type;           // 4
+  uint16_t file_type;           // 2
   uint16_t frame_len;           // 2
   uint16_t enc_len;             // 2
-  uint32_t file_len;            // 4
+  uint16_t pkt_len;             // 2
+  uint32_t data_len;            // 4
   uint32_t reserved[4];
 } opus_tag_t;
 
@@ -427,6 +428,7 @@ bool makeWavToOpus(char *file_name)
 
 
   uint8_t *opus_file_buf;
+  uint8_t *opus_pkt_buf;
   uint32_t opus_file_len = 0;
   opus_tag_t *p_opus_tag;
 
@@ -441,10 +443,13 @@ bool makeWavToOpus(char *file_name)
   }
 
   p_opus_tag = (opus_tag_t *)opus_file_buf;
-
   p_opus_tag->magic_number = 0x5555AAAA;
   p_opus_tag->frame_len = 320;
-  p_opus_tag->file_len = 0;
+  p_opus_tag->data_len = 0;
+  p_opus_tag->pkt_len = 0;
+
+  opus_pkt_buf = &opus_file_buf[sizeof(opus_tag_t)];
+
   while(1)
   {
     int wav_len;
@@ -462,13 +467,22 @@ bool makeWavToOpus(char *file_name)
     enc_len = opus_encode(enc, (const opus_int16 *)wav_buf, frame_len, packet, 1024);
 
 
+    *opus_pkt_buf = enc_len;
+    opus_pkt_buf++;
+
+    p_opus_tag->data_len += 1;
+
     for (int i=0; i<enc_len; i++)
     {
-      opus_file_buf[sizeof(opus_tag_t) + max_enc_size + i] = packet[i];
+      //opus_file_buf[sizeof(opus_tag_t) + max_enc_size + i] = packet[i];
+      *opus_pkt_buf = packet[i];
+      opus_pkt_buf++;
     }
 
     if (enc_len > max_enc_len) max_enc_len = enc_len;
 
+    p_opus_tag->pkt_len++;
+    p_opus_tag->data_len += enc_len;
 
     dec_len = opus_decode(dec, packet, enc_len, outbuf, frame_len, 0);
 
@@ -489,13 +503,14 @@ bool makeWavToOpus(char *file_name)
     max_pkt_size += 1;
   }
 
-  printf("max size     : %d \n", max_file_len);
-  printf("max enc len  : %d \n", max_enc_len);
-  printf("max enc size : %d , %d\n", max_enc_size, max_enc_size+max_pkt_size);
-  printf("max dec size : %d \n", max_dec_size);
+  printf("max size      : %d \n", max_file_len);
+  printf("max enc len   : %d \n", max_enc_len);
+  printf("max pkt len   : %d \n", p_opus_tag->pkt_len);
+  printf("max enc size  : %d , %d\n", max_enc_size, max_enc_size+max_pkt_size);
+  printf("max dec size  : %d \n", max_dec_size);
+  printf("max file size : %d \n", p_opus_tag->data_len);
 
 
-  p_opus_tag->file_len = max_enc_size;
   p_opus_tag->enc_len = max_enc_len;
 
 
@@ -519,7 +534,7 @@ bool makeWavToOpus(char *file_name)
   fwrite(&header, 1, sizeof(header), fp_wavout);
 
 
-  fwrite(opus_file_buf, 1, sizeof(opus_tag_t) + max_enc_size, fp_opus);
+  fwrite(opus_file_buf, 1, sizeof(opus_tag_t) + p_opus_tag->data_len, fp_opus);
   free(opus_file_buf);
 
   fclose(fp_opus);
